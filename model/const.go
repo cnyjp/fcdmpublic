@@ -10,7 +10,8 @@ const (
 
 	//the volume access path for the applicaiton's volumes. which used PREFIX + volumename as a key,
 	//and the access path as the value.
-	FCDM_EV_VOLUME_PREFIX = "FCDM_EV_VOLUME_"
+	FCDM_EV_VOLUME_PREFIX          = "FCDM_EV_VOLUME_"          //the prefix for volume name
+	FCDM_EV_VOLUME_IDENTITY_PREFIX = "FCDM_EV_VOLUME_IDENTITY_" //the prefix for volume identity
 
 	//FCDM_EV_STAGE_TYPE = "FCDM_EV_STAGE_TYPE"
 
