@@ -93,6 +93,8 @@ type Volume struct {
 	FsType        string    `json:"fsType"`             //filesystem type, such ext4,xfs,ntfs and so on.
 	FsDetail      string    `json:"fsDetail,omitempty"` //filesystem details, provider can use it to set the filesystem, such blocksize, privilege
 
+	Identity string `json:"identity"` //Identity on provider side.
+
 	FsPath string `json:"fsPath,omitempty"` //the volume display in the operate system.
 
 	//Stage properties
