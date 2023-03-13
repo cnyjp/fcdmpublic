@@ -8,6 +8,8 @@ const (
 
 	FCDM_EV_AD_PREFIX = "FCDM_EV_AD_" //The options configured in applicaiton
 
+	FCDM_EV_IMAGE_AD_PREFIX = "FCDM_EV_IMAGE_AD_" //the options configured from config for image
+
 	//the volume access path for the applicaiton's volumes. which used PREFIX + volumename as a key,
 	//and the access path as the value.
 	FCDM_EV_VOLUME_PREFIX          = "FCDM_EV_VOLUME_"          //the prefix for volume name
