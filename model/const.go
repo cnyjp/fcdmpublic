@@ -1,16 +1,16 @@
 package model
 
-/**
-  This is the environment variables defined for script and plugins.
+/*
+This is the environment variables defined for script and plugins.
 */
 const (
 	FCDM_EV_COMMAND = "FCDM_EV_COMMAND" //The command need plugin to execute.
 
-	FCDM_EV_AD_PREFIX = "FCDM_EV_AD_" //The options configured in applicaiton
+	FCDM_EV_AD_PREFIX = "FCDM_EV_AD_" //The options configured in application
 
 	FCDM_EV_IMAGE_AD_PREFIX = "FCDM_EV_IMAGE_AD_" //the options configured from config for image
 
-	//the volume access path for the applicaiton's volumes. which used PREFIX + volumename as a key,
+	//the volume access path for the application's volumes. which used PREFIX + volume's name as a key,
 	//and the access path as the value.
 	FCDM_EV_VOLUME_PREFIX          = "FCDM_EV_VOLUME_"          //the prefix for volume name
 	FCDM_EV_VOLUME_IDENTITY_PREFIX = "FCDM_EV_VOLUME_IDENTITY_" //the prefix for volume identity
@@ -20,7 +20,9 @@ const (
 	//FCDM_EV_STAGE_PROTOCOL        = "FCDM_EV_STAGE_PROTOCOL"
 	//FCDM_EV_STAGE_PROTOCOL_TARGET = "FCDM_EV_STAGE_PROTOCOL_TARGET"
 
-	//The applicaiton name used in provider run command.
+	FCDM_EV_APPGROUP_ID = "FCDM_EV_APPGROUP_ID" //for provider, to distinguish if the run job is a group job.
+
+	//The application name used in provider run command.
 	FCDM_EV_APPNAME = "FCDM_EV_APPNAME"
 
 	//The application extension used in provider run command.
@@ -64,8 +66,12 @@ const (
 	//attach to the listapptypeoptions options.
 	FCDM_EV_HOST_LISTAPP_TYPE_OPT_PREFIX = "FCDM_EV_HOST_LISTAPP_TYPE_OPT_"
 
-	FCDM_EV_PROVIDER_INSTANCE_OPT_PREFIX = "FCDM_EV_PROVIDER_INSTANCE_OPT_" //providerinstance mode applicaiton the providerinstance's options.
+	FCDM_EV_PROVIDER_INSTANCE_OPT_PREFIX = "FCDM_EV_PROVIDER_INSTANCE_OPT_" //providerinstance mode application the providerinstance's options.
 	FCDM_EV_PROVIDER_INSTANCE_ID         = "FCDM_EV_PROVIDER_INSTANCE_ID"   //providerinstance的id
+
+	FCDM_EV_TREELIST_NODE_ID            = "FCDM_EV_TREELIST_NODE_ID"            //the tree node to list it's children, empty means root node
+	FCDM_EV_RESTORE_NODE_IDENTITIES     = "FCDM_EV_RESTORE_NODE_IDENTITIES"     //the node identities to restore
+	FCDM_EV_TREELIST_DATA_FILTER_PREFIX = "FCDM_EV_TREELIST_DATA_FILTER_PREFIX" //the search condition for tree list data prefix
 )
 
 const (
@@ -73,24 +79,38 @@ const (
 	FCDM_PROVIDER_PROTECT_DATA_PREFIX    = "FCDM_PROTECT_DATA:" //the backup job need return the
 )
 
-//指令的字符串常量
-//指令，指的是FCDM_EV_COMMAND环境变量中的数据，这个是不能任意设置的，必须在指令常量的范围内
-//Provider Commands
+const (
+	FCDM_PROVIDER_RESTORE_NODE_IDENTITIES_CONFIG_NAME = "FCDM_CONFIG_NODE_IDENTITIES" //specific restore node ids config name in provider
+)
+
+// The special code return by plugins
+const (
+	CODE_STAGE_NEED_EXPAND = 201 //which means the stage need expand by default rules.
+	CODE_STAGE_EXPAND_TO   = 202 //which means the stage need expand by return volume data.
+)
+
+// 指令的字符串常量
+// 指令，指的是FCDM_EV_COMMAND环境变量中的数据，这个是不能任意设置的，必须在指令常量的范围内
+// Provider Commands
 const (
 	CMD_DISCOVER         = "discover"         //发现应用的指令
-	CMD_APPLICATION_INFO = "applicaiton_info" //单独提取一个应用的信息
+	CMD_APPLICATION_INFO = "application_info" //单独提取一个应用的信息
 	CMD_BACKUP           = "backup"           //备份应用的指令
 	CMD_MOUNT            = "mount"            //挂载镜像的指令
 
 	CMD_UMOUNT = "umount" //停止挂载的指令  --  停止挂载是否应该时一个job？？？ -- 似乎也应该是一个job。
 
 	//CMD_APPRESTORE = "apprestore"  //应用数据恢复的指令 -- 数据全部恢复
-	CMD_RESTORE               = "restore"               //文件恢复的指令  --  文件恢复的指令应该有一组文件列表的指令跟随  -- 似乎也没有必要？？？
-	CMD_RESTORE_MOUNT         = "restore_mount"         // -- 为了恢复而进行的mount操作？？？？？似乎没有必要？？？？
-	CMD_RESTORE_TREELIST      = "restore_treelist"      //列出某个tree节点的下级节点，如果没有指定节点则为根节点
-	CMD_RESTORE_LISTRECORD    = "restore_listrecode"    //列出某个tree节点下的所有数据记录（非tree节点），如果没有指定节点则为根节点，参数包括页码
-	CMD_RESTORE_RESTORERECORD = "restore_restorerecord" //恢复某个记录的数据  -- 数据库可以实现 表空间、表、记录恢复，文件系统可以实现 目录、文件恢复
-	CMD_RESTORE_RESTORETREE   = "restore_restoretree"   //恢复某个树节点下的所有数据  -- 如果不指定节点，那就是全部恢复了。
+	CMD_RESTORE = "restore" //文件恢复的指令  --  文件恢复的指令应该有一组文件列表的指令跟随  -- 似乎也没有必要？？？
+	//CMD_RESTORE_MOUNT         = "restore_mount"         // -- 为了恢复而进行的mount操作？？？？？似乎没有必要？？？？
+
+	CMD_RESTORE_RESTORETREE = "restore_restoretree" //恢复某个树节点下的所有数据  -- 如果不指定节点，那就是全部恢复了。
+
+	CMD_APP_LIST_TREENODE      = "app_list_treenode"      //列出某个节点下的treenode的数据
+	CMD_APP_LIST_TREENODE_DATA = "app_list_treenode_data" //列出某个节点下的列表数据
+
+	CMD_RESTORE_LIST_TREENODE      = "restore_list_treenode"      //列出某个tree节点的下级节点，如果没有指定节点则为根节点
+	CMD_RESTORE_LIST_TREENODE_DATA = "restore_list_treenode_data" //列出某个tree节点下的数据列表
 
 	CMD_REQUEST_STAGE         = "request_stage"         //请求stage  -- 由于第三方主机的加入，需要将请求与准备两个动作分开，请求的动作发生在向控制中心发送请求之前和发送中，而准备动作则发生在控制中心返回了stageinfo信息之后
 	CMD_PREPARE_STAGE         = "prepare_stage"         //准备stage  -- 与storage的preparestage分开，指向为主机端准备本地stage的过程
@@ -141,14 +161,14 @@ const (
 
 	CMD_ADAPTER_ADDRESSES = "fcdm_cmd_adapter_address" //传递给adapter获取对应的协议及协议地址的指令
 
-	/******* 第三方主机相关的特殊指令 **************/
+	/****** 第三方主机相关的特殊指令 **************/
 	//CMD_GET_SEARCH_OPTIONS = "get_search_options" //提取所有的检索条件  ---- 问题在于，检索条件本身可能会出现需要 select的option的现象 -- 如果发生了该现象应该从这个接口获取所有的options
 	//第三方主机的search选项可以考虑直接在pluginconfig中进行配置，配置不同种类的application使用何种类型的检索条件，并指定检索条件的输入方式；唯一不同的是，某些select类型的options不是配置文件配置出来的，而是通过上述指令获取的。
 	//CMD_SEARCH_APPLICATIONS = "search_applications" //根据给定的条件检索应用  ---- 对应的指令应包括检索条件，返回值则为检索出来结果的applications。
 
 	CMD_ADAPTER_INIT = "fcdm_cmd_adapter_init" //传递给adapter进行初始化的指令
 
-	/********  存储部分的相关指令   ********/
+	/*******  存储部分的相关指令   ********/
 
 	CMD_GET_STORAGE_STATUS = "get_storage_status" //获取storage server中存储的相关信息
 
@@ -188,8 +208,10 @@ const (
 	CMD_SERVER_DATA_SYNC = "server_data_sync" //从server向主机端同步数据的指令
 )
 
-/**
-  The type of list app, used in the ListAppRequest and ListAppResponse.
+/*
+*
+
+	The type of list app, used in the ListAppRequest and ListAppResponse.
 */
 type ListAppType = string
 
@@ -200,8 +222,10 @@ const (
 	LIST_APP_TYPE_TREE ListAppType = "tree"
 )
 
-/**
-  存储通讯协议的自定义type及其对应的函数和常量。
+/*
+*
+
+	存储通讯协议的自定义type及其对应的函数和常量。
 */
 type StorageProtocol = string
 
@@ -228,7 +252,7 @@ type JobStep = string
 //	return string(*step)
 //}
 
-//定义一个全部job类型与对应的阶段的统一变量，以便后续引用
+// 定义一个全部job类型与对应的阶段的统一变量，以便后续引用
 var JobTypeStepMap = map[string][]JobStep{
 	JOB_TYPE_BACKUP:  {BACKUP_STEP_INIT, BACKUP_STEP_PREPARE, BACKUP_STEP_FREEZE, BACKUP_STEP_THAW, BACKUP_STEP_FINAL, BACKUP_STEP_CANCEL},
 	JOB_TYPE_MOUNT:   {MOUNT_STEP_BEFORE, MOUNT_STEP_AFTER, UMOUNT_STEP_BEFORE, UMOUNT_STEP_AFTER},
@@ -277,8 +301,10 @@ const (
 	JOB_TYPE_RECEIVE JobType = "receive" //复制策略中的接收任务
 )
 
-/**
-  使用的存储类型。指向为stage（舞台）的类型
+/*
+*
+
+	使用的存储类型。指向为stage（舞台）的类型
 */
 type StageType = string
 
@@ -295,7 +321,7 @@ const (
 	ADAPTER_TYPE_INITIATOR AdapterType = "initiator"
 )
 
-/**
+/*
 主机类型。
   主机对应的宿主机的问题：
 */
@@ -317,13 +343,13 @@ const (
 	JOB_PERCENT_PREFIX = "##FCDM JOB PERCENT"
 )
 
-type PluginConfigOption = string
+//type PluginConfigOption = string
+//
+//const (
+//	PLUGIN_CONFIG_PROVIDER_ALLOW_CUSTOM PluginConfigOption = "FCDM_PROVIDER_AllowCustom" //是否允许进行自定义的选项的选项名，只有设置为true的时候才可以进行应用自定义
+//)
 
-const (
-	PLUGIN_CONFIG_PROVIDER_ALLOW_CUSTOM PluginConfigOption = "FCDM_PROVIDER_AllowCustom" //是否允许进行自定义的选项的选项名，只有设置为true的时候才可以进行应用自定义
-)
-
-/**
+/*
 根据主机类型的分析结果，主机类型对应的配置选项
 这是一个事实上的常量，所以，对应的type不使用指针作为成员
 

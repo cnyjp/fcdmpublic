@@ -5,87 +5,103 @@ import (
 	"time"
 )
 
-/**
-  The single config for plugin, applicaiton, and other need config place.
-  In a group of config, use name to identity.
+//ConfigConfig
+/*
+The single config for plugin, application, and other need config place.
+In a group of config, use name to identity.
 */
 type ConfigConfig struct {
 	Name         string                `json:"name"`                   //Identity for config, which can not be empty.
 	Type         string                `json:"type,omitempty"`         //value type, such as string,int,float,bool; the default is string
-	Default      string                `json:"default,omitempty"`      //default value in the input controller. default is a empty string.
+	Default      string                `json:"default,omitempty"`      //default value in the input controller. default is an empty string.
 	InputType    string                `json:"inputType,omitempty"`    //the input controller for the config;such as text,password,select,radio,checkbox,autocomplete, and so on.
 	Limits       map[string]string     `json:"limits,omitempty"`       //Optional, limit conditions, use key->name value->value to define the limits.The key can use such as maxvalue,minvalue,maxlength,minlength,pattern,email and so on.
 	Options      map[string]string     `json:"options,omitempty"`      //Optional, if the input type is select,radio,checkbox, will need options; key->value,value->text(html option)
+	Columns      []ConfigColumn        `json:"columns,omitempty"`      //Optional, if the input type is table, need this config.
 	Desc         string                `json:"desc,omitempty"`         //description for config, will display on the option input ui.
-	I18n         map[string]ConfigI18n `json:"i18n,omitempty"`         //i18n infomation of the config; the key is i18n name, such as zh_CN,en_US.
+	I18n         map[string]ConfigI18n `json:"i18n,omitempty"`         //i18n information of the config; the key is i18n name, such as zh_CN,en_US.
 	JobTypes     []JobType             `json:"jobTypes,omitempty"`     //which job type use the config. if set it to nil or empty, which will used on all job type
 	MustJobTypes []JobType             `json:"mustJobTypes,omitempty"` //which job type must set the config, if set it to nil or empty, which will not must set on all job type.
 }
 
-/**
-  The config i18n struct. Used in ConfigConfig.
-*/
-type ConfigI18n struct {
-	Name    string            `json:"name"`              //display i18n for configconfig's Name
-	Desc    string            `json:"desc"`              //display i18n for configconfig's Desc
-	Options map[string]string `json:"options,omitempty"` //display i18n for configconfig's options.
+type ConfigColumn struct {
+	Name    string                `json:"name"`
+	Type    string                `json:"type"`              //column type, maybe will have some extend type such as string list.
+	Options map[string]string     `json:"options,omitempty"` //if the type is select, radio, checkbox group or other need multi key-value pairs, use the options to set the select value.
+	I18n    map[string]ConfigI18n `json:"i18N,omitempty"`    //i18n
+
 }
 
-//application的唯一性认定：主机id+name+secondlytype来唯一认定一个application
-/**
+//ConfigI18n
+/*
+The config i18n struct. Used in ConfigConfig.
+*/
+type ConfigI18n struct {
+	Name    string            `json:"name"`              //display i18n for ConfigConfig's Name
+	Desc    string            `json:"desc"`              //display i18n for ConfigConfig's Desc
+	Options map[string]string `json:"options,omitempty"` //display i18n for ConfigConfig's options.
+}
+
+//Application
+/*
   Application type struct.
-  Applicaiton in a provider will be identity by secondlyType + Name
-  Which identity by providerInstanceId + sedondlyType + Name at the serverside.
+  application in a provider will be identity by secondlyType + Name
+  Which identity by providerInstanceId + secondlyType + Name at the serverside.
   When the provider use the application, need not config the id field.
 */
+/*
+ The fcdm server identify an application with hostid(providerInstanceId) + application.Name + application.SecondlyType.
+*/
 type Application struct {
-	Id                 string            `json:"id"`                     //Identity for the appliation on server side, useless for provider.
-	Name               string            `json:"name,omitempty"`         //provider identity a applicaiton by secondlytype + name
-	ProviderInstanceId string            `json:"providerInstanceId"`     //the provider instance id for the applicaiton, useless for provider.
+	Id                 string            `json:"id"`                     //Identity for the application on server side, useless for provider.
+	Name               string            `json:"name,omitempty"`         //provider identity an application by secondlyType + name
+	ProviderInstanceId string            `json:"providerInstanceId"`     //the provider instance id for the application, useless for provider.
 	ProviderId         string            `json:"providerId"`             //provider id, useless for provider.
 	ProviderName       string            `json:"providerName,omitempty"` //provider name, useless for provider
-	DisplayName        string            `json:"displayName,omitempty"`  //The display name for the applicaiton, if the provider want the application has a friendly name to display
-	SecondlyType       string            `json:"secondlyType,omitempty"` //provider identity a applicaiton by secondlytype + name
-	Size               int64             `json:"size,omitempty"`         //application size, the server side will count it by the volumes info.
+	DisplayName        string            `json:"displayName,omitempty"`  //The display name for the application, if the provider want the application has a friendly name to display
+	SecondlyType       string            `json:"secondlyType,omitempty"` //provider identity an application by secondlyType + name
+	Size               int64             `json:"size,omitempty"`         //application size, the server side will count it by the info of volumes.
 	Volumes            []Volume          `json:"volumes,omitempty"`      //All application use space, provider must set all volume info correct.
-	Options            map[string]string `json:"options,omitempty"`      //applicaiton options, if the provider nned set the application's default value, can use it.
-	//if the common information can not include the application's all info, provider can set the extend info in this field.
-	//which will be set a env FCDM_EV_APP_EXTENSION when provider execute any command for a application.
+	Options            map[string]string `json:"options,omitempty"`      //application options, if the provider need set the application's default value, can use it.
+	//if the common information can not include the application's all info, provider can set the extension info in this field.
+	//which will be set an env FCDM_EV_APP_EXTENSION when provider execute any command for an application.
 	Extensions string `json:"extensions,omitempty"`
 
-	//The display fields info, match the listconfig in secondlytype.
+	//The display fields info, match the listConfig in secondlyType.
 	DisplayFields map[string]string `json:"displayFields,omitempty"`
 
 	StageAutoExpand string `json:"stageAutoExpand,omitempty"` //auto expand
 	ExpandPercent   int    `json:"expandPercent,omitempty"`   //percent in auto expand
 
-	Haslog bool `json:"haslog"` //dose the applicaiton has a log.
+	Haslog bool `json:"haslog"` //dose the application has a log.
 
 	Remark string `json:"remark,omitempty"` //remark
 
-	//the configs for this applicaiton.
+	//the configs for this application.
 	//if the provider does set configs, this will use the config in plugin config.
 	Configs []ConfigConfig `json:"configs,omitempty"`
 
 	HostId   string `json:"hostId,omitempty"`
 	HostType string `json:"hostType,omitempty"`
 
-	Avaiable bool `json:"avaiable"` //is avaiable
+	Available bool `json:"available"` //is available
 
 	ParentId string        `json:"parentId,omitempty"`
 	Childs   []Application `json:"childs,omitempty"`
+	Custom   bool          `json:"custom"` //is the application is created by tenant.
 }
 
-/**
-  The volume is the storage space for a applicaiton.
-  In an applicaiton, the volume name is the identity.
-  In provider, need not config the Id field for the volume.
+//Volume
+/*
+The volume is the storage space for an application.
+In an application, the volume name is the identity.
+In provider, need not config Id for the volume.
 */
 type Volume struct {
 	Id            string    `json:"id"`            //Identity on the server side, useless on provider.
 	TargetId      string    `json:"targetId"`      //Target identity on the server side, useless on provider.
-	ApplicationId string    `json:"applicationId"` //Applicaiton identity on the server side, useless on provider.
-	Name          string    `json:"name"`          //Name for volume, in a application, it is the identity.
+	ApplicationId string    `json:"applicationId"` //application identity on the server side, useless on provider.
+	Name          string    `json:"name"`          //Name for volume, in an application, it is the identity.
 	DisplayName   string    `json:"displayName"`   //When the provider need the volume need a friendly name to display, can use it.
 	StageType     StageType `json:"stageType"`     //StageType
 	Size          int64     `json:"size"`
@@ -103,63 +119,108 @@ type Volume struct {
 	StageSize int64 `json:"stageSize,omitempty"` //The stagesize provider want for the volume.
 }
 
-/**
-  The plugin config struct.
+//PluginConfig
+/*
+The plugin config struct.
 */
 type PluginConfig struct {
-	PEName   string            `json:"pename"`            //PE file name，
-	SignInfo SignInfo          `json:"signInfo"`          //signinfo for the pefile.
-	Options  map[string]string `json:"options,omitempty"` //The default options for the plugin.
+	PEName      string            `json:"pename"`            //PE file name，
+	SignInfo    SignInfo          `json:"signInfo"`          //signInfo for the peFile.
+	AllowCustom bool              `json:"allowCustom"`       //in provider config, this will allow the provider create a custom application.
+	Options     map[string]string `json:"options,omitempty"` //The default options for the plugin.
 
 	//if the options is not nil, this will be the option's i18n
 	//key for i18n zone, such as zh_CN,en_US, value for the options
 	OptionsI18n map[string]ConfigI18n `json:"optionsI18n,omitempty"`
 
-	//configs for the plugin. if the provider does not set the application's configs, it will be the applicaion's config.
+	//configs for the plugin. if the provider does not set the application's configs, it will be the application's config.
 	Configs []ConfigConfig `json:"configs,omitempty"`
 
-	//search condition for secondlytype: the key for secondly_type
+	//search condition for secondlyType: the key is a secondlyType
 	//value for a list config.
 	AppSearchConditions map[string][]ConfigConfig `json:"appSearchConditions"`
 
 	//the list type supported in the provider.
-	ListAppTypes []string `json:"listAppTypes"`
+	ListAppTypes []ListAppType `json:"listAppTypes"`
 }
 
-/**
-  The sign info struct for plugin command file.
+//SignInfo
+/*
+The sign info struct for plugin command file.
 */
 type SignInfo struct {
 	Version string `json:"version"`
 	Sign    string `json:"sign"`
 }
 
-/**
-  The plugin info returned struct by the command CMD_PLUGIN_INFO
+//PluginCmdInfo
+/*
+	The plugin info returned struct by the command CMD_PLUGIN_INFO
 */
 type PluginCmdInfo struct {
 	Name    string `json:"name"`
 	Version string `json:"version"`
 }
 
-//If the  response used tree node mode to return data, use the tree node struct.
+// TreeNode
+// If the  response used tree node mode to return data, use the tree node struct.
 type TreeNode struct {
-	Id                    string `json:"id"`
-	Name                  string `json:"name"`
-	ParentId              string `json:"parentId"`
-	IsLeaf                bool   `json:"isLeaf"`
-	TargetApplicationName string `json:"targetApplicationName"` //The Applicaiton Name which the tree node point.
+	Identity       string         `json:"identity"`
+	Name           string         `json:"name"` //the name of the
+	ParentIdentity string         `json:"parentIdentity"`
+	IsLeaf         bool           `json:"isLeaf"`                //if the node is a leaf node, false means it is a branch, not a leaf.
+	DataFilters    []ConfigConfig `json:"dataFilters,omitempty"` //The data filter rules. just the provider's appSearchCondition
 }
 
-/** custom time format, use yyyy-MM-dd HH:mm:ss to transform the datetime.  */
+// TreeNodeList
+// the node list struct
+type TreeNodeList struct {
+	ParentIdentity string     `json:"parentIdentity"`
+	MoreId         string     `json:"moreId,omitempty"`
+	Nodes          []TreeNode `json:"nodes"`                //the node list
+	HasMore        bool       `json:"hasMore"`              //does the tree node list has more data
+	NextMoreId     string     `json:"nextMoreId,omitempty"` //for more data, need use the id to get next data.
+}
+
+// TreeNodeData
+// The Data for tree node
+type TreeNodeData struct {
+	NodeId         string              `json:"parentId"`
+	Filters        map[string]string   `json:"filters"`          //The filter rules for data list.
+	MoreDataId     string              `json:"moreId,omitempty"` //When the data is a response for a more data request, this is the request moreDataId.
+	Columns        []ConfigColumn      `json:"columns"`
+	Values         []map[string]string `json:"values"`                   //value list, the map key is the column name
+	HasMore        bool                `json:"hasMore"`                  //does the data has more elements.
+	NextMoreDataId string              `json:"nextMoreDataId,omitempty"` //if the data has more elements, this is the request moreDataId for next request.
+}
+
+// Time
+/* custom time format, use yyyy-MM-dd HH:mm:ss to transform the datetime.  */
 type Time time.Time
 
 const (
-	timeFormart = "2006-01-02 15:04:05"
+	timeFormat = "2006-01-02 15:04:05"
 )
 
+// ToLocalTime
+/*
+	transfer the time to a *time.Time format data with location.
+*/
+func (t *Time) ToLocalTime(location *time.Location) *time.Time {
+	if nil == t {
+		return nil
+	}
+	tt, err := time.ParseInLocation(timeFormat, t.String(), location)
+
+	if nil != err {
+		return nil
+	}
+
+	return &tt
+}
+
 func (t *Time) UnmarshalJSON(data []byte) (err error) {
-	now, err := time.ParseInLocation(`"`+timeFormart+`"`, string(data), time.Local)
+	now, err := time.ParseInLocation(`"`+timeFormat+`"`, string(data), time.Local)
 	if nil != err {
 		//use the normal format to transform
 		tt := time.Time{}
@@ -171,22 +232,22 @@ func (t *Time) UnmarshalJSON(data []byte) (err error) {
 	return nil
 }
 
-//check the time is init value.
+// check the time is init value.
 func (t *Time) IsZero() bool {
 	tt := time.Time(*t)
 	return tt.IsZero()
 }
 
 func (t Time) MarshalJSON() ([]byte, error) {
-	b := make([]byte, 0, len(timeFormart)+2)
+	b := make([]byte, 0, len(timeFormat)+2)
 	b = append(b, '"')
-	b = time.Time(t).AppendFormat(b, timeFormart)
+	b = time.Time(t).AppendFormat(b, timeFormat)
 	b = append(b, '"')
 	return b, nil
 }
 
 func (t Time) String() string {
-	return time.Time(t).Format(timeFormart)
+	return time.Time(t).Format(timeFormat)
 }
 func Now() Time {
 	return Time(time.Now())
@@ -199,9 +260,9 @@ type SecondlyType struct {
 	Name string                `json:"name"` //
 	I18n map[string]ConfigI18n `json:"i18n"` //i18n for name
 
-	//the list item for the secondlytype
+	//the list item for the secondlyType
 	ListConfigs []ConfigConfig `json:"listConfigs"`
-	//the search item for the secondlytype
+	//the search item for the secondlyType
 	SearchConfigs []ConfigConfig `json:"searchConfigs"`
 }
 
