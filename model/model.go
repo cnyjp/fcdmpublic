@@ -26,7 +26,7 @@ type ConfigConfig struct {
 
 type ConfigColumn struct {
 	Name    string                `json:"name"`
-	Type    string                `json:"type"`              //column type, maybe will have some extend type such as string list.
+	Type    string                `json:"type"`              //column type, maybe will have some extended type such as string list.
 	Options map[string]string     `json:"options,omitempty"` //if the type is select, radio, checkbox group or other need multi key-value pairs, use the options to set the select value.
 	I18n    map[string]ConfigI18n `json:"i18N,omitempty"`    //i18n
 
@@ -95,7 +95,7 @@ type Application struct {
 /*
 The volume is the storage space for an application.
 In an application, the volume name is the identity.
-In provider, need not config Id for the volume.
+In provider, need not config id for the volume.
 */
 type Volume struct {
 	Id            string    `json:"id"`            //Identity on the server side, useless on provider.
@@ -109,7 +109,7 @@ type Volume struct {
 	FsType        string    `json:"fsType"`             //filesystem type, such ext4,xfs,ntfs and so on.
 	FsDetail      string    `json:"fsDetail,omitempty"` //filesystem details, provider can use it to set the filesystem, such blocksize, privilege
 
-	Identity string `json:"identity"` //Identity on provider side.
+	Identity string `json:"identity,omitempty"` //Identity on provider side.
 
 	FsPath string `json:"fsPath,omitempty"` //the volume display in the operate system.
 
@@ -136,12 +136,22 @@ type PluginConfig struct {
 	//configs for the plugin. if the provider does not set the application's configs, it will be the application's config.
 	Configs []ConfigConfig `json:"configs,omitempty"`
 
+	ConfigIcon ConfigIcon `json:"configIcon,omitempty"`
+
+	//if the plugin is a host provider, this is used to config all SecondlyType Config.
+	SecondlyTypes []SecondlyType `json:"secondlyTypes,omitempty"`
+
 	//search condition for secondlyType: the key is a secondlyType
 	//value for a list config.
-	AppSearchConditions map[string][]ConfigConfig `json:"appSearchConditions"`
+	AppSearchConditions map[string][]ConfigConfig `json:"appSearchConditions,omitempty"`
 
-	//the list type supported in the provider.
-	ListAppTypes []ListAppType `json:"listAppTypes"`
+	//the list type supported in the provider. use 	LIST_APP_TYPE_ALL,LIST_APP_TYPE_PAGE,LIST_APP_TYPE_MORE,LIST_APP_TYPE_TREE
+	ListAppTypes []ListAppType `json:"listAppTypes,omitempty"`
+}
+
+type ConfigIcon struct {
+	Icon32  string `json:"icon32,omitempty"`  //the icon 32*32 encoded base64, use png gif image
+	Icon256 string `json:"icon256,omitempty"` //the icon 256*256 encoded base64 use png gif image
 }
 
 //SignInfo
@@ -150,7 +160,7 @@ The sign info struct for plugin command file.
 */
 type SignInfo struct {
 	Version string `json:"version"`
-	Sign    string `json:"sign"`
+	Sign    string `json:"sign,omitempty"`
 }
 
 //PluginCmdInfo
@@ -188,7 +198,7 @@ type TreeNodeData struct {
 	NodeId         string              `json:"parentId"`
 	Filters        map[string]string   `json:"filters"`          //The filter rules for data list.
 	MoreDataId     string              `json:"moreId,omitempty"` //When the data is a response for a more data request, this is the request moreDataId.
-	Columns        []ConfigColumn      `json:"columns"`
+	Columns        []ConfigColumn      `json:"columns,omitempty"`
 	Values         []map[string]string `json:"values"`                   //value list, the map key is the column name
 	HasMore        bool                `json:"hasMore"`                  //does the data has more elements.
 	NextMoreDataId string              `json:"nextMoreDataId,omitempty"` //if the data has more elements, this is the request moreDataId for next request.
@@ -257,13 +267,17 @@ func (t *Time) Format(format string) string {
 }
 
 type SecondlyType struct {
-	Name string                `json:"name"` //
-	I18n map[string]ConfigI18n `json:"i18n"` //i18n for name
+	Name string                `json:"name"`           //
+	I18n map[string]ConfigI18n `json:"i18n,omitempty"` //i18n for name
 
 	//the list item for the secondlyType
-	ListConfigs []ConfigConfig `json:"listConfigs"`
+	ListConfigs []ConfigConfig `json:"listConfigs,omitempty"`
 	//the search item for the secondlyType
-	SearchConfigs []ConfigConfig `json:"searchConfigs"`
+	SearchConfigs []ConfigConfig `json:"searchConfigs,omitempty"`
+	//the application configs for this SecondlyType
+	ApplicationConfigs []ConfigConfig `json:"applicationConfigs,omitempty"`
+
+	ConfigIcon ConfigIcon `json:"configIcon,omitempty"`
 }
 
 type ScriptSet struct {
