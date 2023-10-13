@@ -25,11 +25,12 @@ type ConfigConfig struct {
 }
 
 type ConfigColumn struct {
-	Name    string                `json:"name"`
-	Type    string                `json:"type"`              //column type, maybe will have some extended type such as string list.
-	Options map[string]string     `json:"options,omitempty"` //if the type is select, radio, checkbox group or other need multi key-value pairs, use the options to set the select value.
-	I18n    map[string]ConfigI18n `json:"i18N,omitempty"`    //i18n
-
+	Name      string                `json:"name"`
+	Type      string                `json:"type"`              //column type, such as type of ConfigConfig, string as default.
+	InputType string                `json:"inputType"`         //input type for column, such as inputType of ConfigConfig, text is default.
+	Options   map[string]string     `json:"options,omitempty"` //if the type is select, radio, checkbox group or other need multi key-value pairs, use the options to set the select value.
+	Desc      string                `json:"desc,omitempty"`    //description for column, sometimes the desc maybe display on the at the column tips
+	I18n      map[string]ConfigI18n `json:"i18N,omitempty"`    //i18n
 }
 
 //ConfigI18n
@@ -98,15 +99,15 @@ In an application, the volume name is the identity.
 In provider, need not config id for the volume.
 */
 type Volume struct {
-	Id            string    `json:"id"`            //Identity on the server side, useless on provider.
-	TargetId      string    `json:"targetId"`      //Target identity on the server side, useless on provider.
-	ApplicationId string    `json:"applicationId"` //application identity on the server side, useless on provider.
-	Name          string    `json:"name"`          //Name for volume, in an application, it is the identity.
-	DisplayName   string    `json:"displayName"`   //When the provider need the volume need a friendly name to display, can use it.
-	StageType     StageType `json:"stageType"`     //StageType
+	Id            string    `json:"id,omitempty"`            //Identity on the server side, useless on provider.
+	TargetId      string    `json:"targetId,omitempty"`      //Target identity on the server side, useless on provider.
+	ApplicationId string    `json:"applicationId,omitempty"` //application identity on the server side, useless on provider.
+	Name          string    `json:"name"`                    //Name for volume, in an application, it is the identity.
+	DisplayName   string    `json:"displayName,omitempty"`   //When the provider need the volume need a friendly name to display, can use it.
+	StageType     StageType `json:"stageType"`               //StageType
 	Size          int64     `json:"size"`
 	BlockSize     int       `json:"blockSize,omitempty"`
-	FsType        string    `json:"fsType"`             //filesystem type, such ext4,xfs,ntfs and so on.
+	FsType        string    `json:"fsType,omitempty"`   //filesystem type, such ext4,xfs,ntfs and so on.
 	FsDetail      string    `json:"fsDetail,omitempty"` //filesystem details, provider can use it to set the filesystem, such blocksize, privilege
 
 	Identity string `json:"identity,omitempty"` //Identity on provider side.
@@ -143,10 +144,10 @@ type PluginConfig struct {
 
 	//search condition for secondlyType: the key is a secondlyType
 	//value for a list config.
-	AppSearchConditions map[string][]ConfigConfig `json:"appSearchConditions,omitempty"`
+	AppSearchConditions map[string][]ConfigConfig `json:"appSearchConditions"`
 
 	//the list type supported in the provider. use 	LIST_APP_TYPE_ALL,LIST_APP_TYPE_PAGE,LIST_APP_TYPE_MORE,LIST_APP_TYPE_TREE
-	ListAppTypes []ListAppType `json:"listAppTypes,omitempty"`
+	ListAppTypes []ListAppType `json:"listAppTypes"`
 }
 
 type ConfigIcon struct {
@@ -160,7 +161,7 @@ The sign info struct for plugin command file.
 */
 type SignInfo struct {
 	Version string `json:"version"`
-	Sign    string `json:"sign,omitempty"`
+	Sign    string `json:"sign"`
 }
 
 //PluginCmdInfo
@@ -198,7 +199,7 @@ type TreeNodeData struct {
 	NodeId         string              `json:"parentId"`
 	Filters        map[string]string   `json:"filters"`          //The filter rules for data list.
 	MoreDataId     string              `json:"moreId,omitempty"` //When the data is a response for a more data request, this is the request moreDataId.
-	Columns        []ConfigColumn      `json:"columns,omitempty"`
+	Columns        []ConfigColumn      `json:"columns"`
 	Values         []map[string]string `json:"values"`                   //value list, the map key is the column name
 	HasMore        bool                `json:"hasMore"`                  //does the data has more elements.
 	NextMoreDataId string              `json:"nextMoreDataId,omitempty"` //if the data has more elements, this is the request moreDataId for next request.
@@ -267,8 +268,8 @@ func (t *Time) Format(format string) string {
 }
 
 type SecondlyType struct {
-	Name string                `json:"name"`           //
-	I18n map[string]ConfigI18n `json:"i18n,omitempty"` //i18n for name
+	Name string                `json:"name"` //
+	I18n map[string]ConfigI18n `json:"i18n"` //i18n for name
 
 	//the list item for the secondlyType
 	ListConfigs []ConfigConfig `json:"listConfigs,omitempty"`
