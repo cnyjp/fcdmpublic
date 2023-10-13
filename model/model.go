@@ -26,8 +26,10 @@ type ConfigConfig struct {
 
 type ConfigColumn struct {
 	Name      string                `json:"name"`
-	Type      string                `json:"type"`              //column type, such as type of ConfigConfig, string as default.
-	InputType string                `json:"inputType"`         //input type for column, such as inputType of ConfigConfig, text is default.
+	Type      string                `json:"type,omitempty"`      //column type, such as type of ConfigConfig, string as default.
+	InputType string                `json:"inputType,omitempty"` //input type for column, such as inputType of ConfigConfig, text is default.
+	Default   string                `json:"default,omitempty"`
+	Limits    map[string]string     `json:"limits,omitempty"`  //Optional, limit conditions, use key->name value->value to define the limits.The key can use such as maxvalue,minvalue,maxlength,minlength,pattern,email and so on.
 	Options   map[string]string     `json:"options,omitempty"` //if the type is select, radio, checkbox group or other need multi key-value pairs, use the options to set the select value.
 	Desc      string                `json:"desc,omitempty"`    //description for column, sometimes the desc maybe display on the at the column tips
 	I18n      map[string]ConfigI18n `json:"i18n,omitempty"`    //i18n
