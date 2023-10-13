@@ -30,7 +30,7 @@ type ConfigColumn struct {
 	InputType string                `json:"inputType"`         //input type for column, such as inputType of ConfigConfig, text is default.
 	Options   map[string]string     `json:"options,omitempty"` //if the type is select, radio, checkbox group or other need multi key-value pairs, use the options to set the select value.
 	Desc      string                `json:"desc,omitempty"`    //description for column, sometimes the desc maybe display on the at the column tips
-	I18n      map[string]ConfigI18n `json:"i18N,omitempty"`    //i18n
+	I18n      map[string]ConfigI18n `json:"i18n,omitempty"`    //i18n
 }
 
 //ConfigI18n
