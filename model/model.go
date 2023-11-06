@@ -11,28 +11,30 @@ The single config for plugin, application, and other need config place.
 In a group of config, use name to identity.
 */
 type ConfigConfig struct {
-	Name         string                `json:"name"`                   //Identity for config, which can not be empty.
-	Type         string                `json:"type,omitempty"`         //value type, such as string,int,float,bool; the default is string
-	Default      string                `json:"default,omitempty"`      //default value in the input controller. default is an empty string.
-	InputType    string                `json:"inputType,omitempty"`    //the input controller for the config;such as text,password,select,radio,checkbox,autocomplete, and so on.
-	Limits       map[string]string     `json:"limits,omitempty"`       //Optional, limit conditions, use key->name value->value to define the limits.The key can use such as maxvalue,minvalue,maxlength,minlength,pattern,email and so on.
-	Options      map[string]string     `json:"options,omitempty"`      //Optional, if the input type is select,radio,checkbox, will need options; key->value,value->text(html option)
-	Columns      []ConfigColumn        `json:"columns,omitempty"`      //Optional, if the input type is table, need this config.
-	Desc         string                `json:"desc,omitempty"`         //description for config, will display on the option input ui.
-	I18n         map[string]ConfigI18n `json:"i18n,omitempty"`         //i18n information of the config; the key is i18n name, such as zh_CN,en_US.
-	JobTypes     []JobType             `json:"jobTypes,omitempty"`     //which job type use the config. if set it to nil or empty, which will used on all job type
-	MustJobTypes []JobType             `json:"mustJobTypes,omitempty"` //which job type must set the config, if set it to nil or empty, which will not must set on all job type.
+	Name            string                `json:"name"`                      //Identity for config, which can not be empty.
+	Type            string                `json:"type,omitempty"`            //value type, such as string,int,float,bool; the default is string
+	Default         string                `json:"default,omitempty"`         //default value in the input controller. default is an empty string.
+	InputType       string                `json:"inputType,omitempty"`       //the input controller for the config;such as text,password,select,radio,checkbox,autocomplete, and so on.
+	Limits          map[string]string     `json:"limits,omitempty"`          //Optional, limit conditions, use key->name value->value to define the limits.The key can use such as maxvalue,minvalue,maxlength,minlength,pattern,email and so on.
+	Options         map[string]string     `json:"options,omitempty"`         //Optional, if the input type is select,radio,checkbox, will need options; key->value,value->text(html option)
+	Columns         []ConfigColumn        `json:"columns,omitempty"`         //Optional, if the input type is table, need this config.
+	Desc            string                `json:"desc,omitempty"`            //description for config, will display on the option input ui.
+	ValidateMessage string                `json:"validateMessage,omitempty"` //Optional, when the config validate error, show this message.
+	I18n            map[string]ConfigI18n `json:"i18n,omitempty"`            //i18n information of the config; the key is i18n name, such as zh_CN,en_US.
+	JobTypes        []JobType             `json:"jobTypes,omitempty"`        //which job type use the config. if set it to nil or empty, which will used on all job type
+	MustJobTypes    []JobType             `json:"mustJobTypes,omitempty"`    //which job type must set the config, if set it to nil or empty, which will not must set on all job type.
 }
 
 type ConfigColumn struct {
-	Name      string                `json:"name"`
-	Type      string                `json:"type,omitempty"`      //column type, such as type of ConfigConfig, string as default.
-	InputType string                `json:"inputType,omitempty"` //input type for column, such as inputType of ConfigConfig, text is default.
-	Default   string                `json:"default,omitempty"`
-	Limits    map[string]string     `json:"limits,omitempty"`  //Optional, limit conditions, use key->name value->value to define the limits.The key can use such as maxvalue,minvalue,maxlength,minlength,pattern,email and so on.
-	Options   map[string]string     `json:"options,omitempty"` //if the type is select, radio, checkbox group or other need multi key-value pairs, use the options to set the select value.
-	Desc      string                `json:"desc,omitempty"`    //description for column, sometimes the desc maybe display on the at the column tips
-	I18n      map[string]ConfigI18n `json:"i18n,omitempty"`    //i18n
+	Name            string                `json:"name"`
+	Type            string                `json:"type,omitempty"`            //column type, such as type of ConfigConfig, string as default.
+	InputType       string                `json:"inputType,omitempty"`       //input type for column, such as inputType of ConfigConfig, text is default.
+	Default         string                `json:"default,omitempty"`         //same as ConfigConfig Default
+	Limits          map[string]string     `json:"limits,omitempty"`          //Optional, limit conditions, use key->name value->value to define the limits.The key can use such as maxvalue,minvalue,maxlength,minlength,pattern,email and so on.
+	Options         map[string]string     `json:"options,omitempty"`         //if the type is select, radio, checkbox group or other need multi key-value pairs, use the options to set the select value.
+	Desc            string                `json:"desc,omitempty"`            //description for column, sometimes the desc maybe display on the at the column tips
+	ValidateMessage string                `json:"validateMessage,omitempty"` //save as ConfigConfig ValidateMessage
+	I18n            map[string]ConfigI18n `json:"i18n,omitempty"`            //i18n
 }
 
 //ConfigI18n
@@ -40,9 +42,10 @@ type ConfigColumn struct {
 The config i18n struct. Used in ConfigConfig.
 */
 type ConfigI18n struct {
-	Name    string            `json:"name"`              //display i18n for ConfigConfig's Name
-	Desc    string            `json:"desc"`              //display i18n for ConfigConfig's Desc
-	Options map[string]string `json:"options,omitempty"` //display i18n for ConfigConfig's options.
+	Name            string            `json:"name"`                      //display i18n for ConfigConfig's Name
+	Desc            string            `json:"desc"`                      //display i18n for ConfigConfig's Desc
+	ValidateMessage string            `json:"validateMessage,omitempty"` //display i18n for ConfigConfig's ValidateMessage
+	Options         map[string]string `json:"options,omitempty"`         //display i18n for ConfigConfig's options.
 }
 
 //Application
