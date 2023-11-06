@@ -43,11 +43,11 @@ type ConfigColumn struct {
 The config i18n struct. Used in ConfigConfig.
 */
 type ConfigI18n struct {
-	Name               string            `json:"name"`                      //display i18n for ConfigConfig's Name
-	Desc               string            `json:"desc"`                      //display i18n for ConfigConfig's Desc
-	ValidateMessage    string            `json:"validateMessage,omitempty"` //display i18n for ConfigConfig's ValidateMessage
-	Options            map[string]string `json:"options,omitempty"`         //display i18n for ConfigConfig's options.
-	LimitsErrorMessage map[string]string `json:"limits,omitempty"`          //display i18n for ConfigConfig's Limits error message
+	Name               string            `json:"name"`                         //display i18n for ConfigConfig's Name
+	Desc               string            `json:"desc"`                         //display i18n for ConfigConfig's Desc
+	ValidateMessage    string            `json:"validateMessage,omitempty"`    //display i18n for ConfigConfig's ValidateMessage
+	Options            map[string]string `json:"options,omitempty"`            //display i18n for ConfigConfig's options.
+	LimitsErrorMessage map[string]string `json:"limitsErrorMessage,omitempty"` //display i18n for ConfigConfig's Limits error message
 }
 
 //Application
