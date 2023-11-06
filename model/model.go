@@ -46,6 +46,7 @@ type ConfigI18n struct {
 	Desc            string            `json:"desc"`                      //display i18n for ConfigConfig's Desc
 	ValidateMessage string            `json:"validateMessage,omitempty"` //display i18n for ConfigConfig's ValidateMessage
 	Options         map[string]string `json:"options,omitempty"`         //display i18n for ConfigConfig's options.
+	Limits          map[string]string `json:"limits,omitempty"`          //display i18n for ConfigConfig's Limits validate error message
 }
 
 //Application
