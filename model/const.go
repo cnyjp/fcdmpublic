@@ -15,6 +15,8 @@ const (
 	FCDM_EV_VOLUME_PREFIX          = "FCDM_EV_VOLUME_"          //the prefix for volume name
 	FCDM_EV_VOLUME_IDENTITY_PREFIX = "FCDM_EV_VOLUME_IDENTITY_" //the prefix for volume identity
 
+	FCDM_EV_CUSTOM_VOLUME_NAME_PREFIX = "FCDM_EV_CUSTOM_VOLUME_NAME_" //the prefix for custom volume name
+
 	//FCDM_EV_STAGE_TYPE = "FCDM_EV_STAGE_TYPE"
 
 	//FCDM_EV_STAGE_PROTOCOL        = "FCDM_EV_STAGE_PROTOCOL"
@@ -85,39 +87,42 @@ const (
 
 // The special code return by plugins
 const (
+	CODE_RUN_SUCCESS       = 0   //which means the plugin run command succeed.
 	CODE_STAGE_NEED_EXPAND = 201 //which means the stage need expand by default rules.
 	CODE_STAGE_EXPAND_TO   = 202 //which means the stage need expand by return volume data.
+	CODE_DISCOVER          = 203 //which means the provider found application change, need refresh the application's information
 )
 
-// 指令的字符串常量
-// 指令，指的是FCDM_EV_COMMAND环境变量中的数据，这个是不能任意设置的，必须在指令常量的范围内
-// Provider Commands
+// command string
+// these command is used for FCDM_EV_COMMAND env, FCDM_EV_COMMAND must be one of the command list.
+// plugin commands
 const (
-	CMD_DISCOVER         = "discover"         //发现应用的指令
-	CMD_APPLICATION_INFO = "application_info" //单独提取一个应用的信息
-	CMD_BACKUP           = "backup"           //备份应用的指令
-	CMD_MOUNT            = "mount"            //挂载镜像的指令
+	CMD_DISCOVER = "discover" //command discover applications
 
-	CMD_UMOUNT = "umount" //停止挂载的指令  --  停止挂载是否应该时一个job？？？ -- 似乎也应该是一个job。
+	CMD_DISCOVER_APP_MORE = "discover_app_more" //command to use an application's options to discover more child or and other details
 
-	//CMD_APPRESTORE = "apprestore"  //应用数据恢复的指令 -- 数据全部恢复
-	CMD_RESTORE = "restore" //文件恢复的指令  --  文件恢复的指令应该有一组文件列表的指令跟随  -- 似乎也没有必要？？？
-	//CMD_RESTORE_MOUNT         = "restore_mount"         // -- 为了恢复而进行的mount操作？？？？？似乎没有必要？？？？
+	CMD_APPLICATION_INFO = "application_info" //command used to retrieve an application's information
+	CMD_BACKUP           = "backup"           //command for backup operate
+	CMD_MOUNT            = "mount"            //command for mount operate
 
-	CMD_RESTORE_RESTORETREE = "restore_restoretree" //恢复某个树节点下的所有数据  -- 如果不指定节点，那就是全部恢复了。
+	CMD_UMOUNT = "umount" //command for umount operate
 
-	CMD_APP_LIST_TREENODE      = "app_list_treenode"      //列出某个节点下的treenode的数据
-	CMD_APP_LIST_TREENODE_DATA = "app_list_treenode_data" //列出某个节点下的列表数据
+	CMD_RESTORE = "restore" //command for restore operate
 
-	CMD_RESTORE_LIST_TREENODE      = "restore_list_treenode"      //列出某个tree节点的下级节点，如果没有指定节点则为根节点
-	CMD_RESTORE_LIST_TREENODE_DATA = "restore_list_treenode_data" //列出某个tree节点下的数据列表
+	CMD_RESTORE_RESTORETREE = "restore_restoretree" //command for restore data under a tree node. if not specific a tree node, should restore all data.
 
-	CMD_REQUEST_STAGE         = "request_stage"         //请求stage  -- 由于第三方主机的加入，需要将请求与准备两个动作分开，请求的动作发生在向控制中心发送请求之前和发送中，而准备动作则发生在控制中心返回了stageinfo信息之后
-	CMD_PREPARE_STAGE         = "prepare_stage"         //准备stage  -- 与storage的preparestage分开，指向为主机端准备本地stage的过程
-	CMD_STORAGE_PREPARE_STAGE = "storage_prepare_stage" //准备stage  -- 该命令可以发给服务器，也可以发给clientadapter，storagaengine，serveradapter；每个组件对应的操作不同，但是指令应该是相同的。
-	CMD_STORAGE_CREATE_IMAGE  = "storage_create_image"  //创建镜像  -- 该命令可以发给服务器，也可以发给clientadapter，storagaengine，serveradapter；每个组件对应的操作不同，但是指令应该是相同的。
-	CMD_STORAGE_CLEAR_STAGE   = "storage_clear_stage"   //清理stage  -- 指向为存储服务器清理stage
-	CMD_CLEAR_STAGE           = "clear_stage"           //清理stage的相应资源  -- 同上
+	CMD_APP_LIST_TREENODE      = "app_list_treenode"      //command to list a tree node's children node data
+	CMD_APP_LIST_TREENODE_DATA = "app_list_treenode_data" //command to list a tree node's list data
+
+	CMD_RESTORE_LIST_TREENODE      = "restore_list_treenode"      //command to list a tree node's children node data on restore mode.
+	CMD_RESTORE_LIST_TREENODE_DATA = "restore_list_treenode_data" //command to list a tree node's list data on restore mode
+
+	CMD_REQUEST_STAGE         = "request_stage"         //command request stage  -- 由于第三方主机的加入，需要将请求与准备两个动作分开，请求的动作发生在向控制中心发送请求之前和发送中，而准备动作则发生在控制中心返回了stageinfo信息之后
+	CMD_PREPARE_STAGE         = "prepare_stage"         //command prepare stage  -- 与storage的preparestage分开，指向为主机端准备本地stage的过程
+	CMD_STORAGE_PREPARE_STAGE = "storage_prepare_stage" //command prepare stage on storage server side.  -- 该命令可以发给服务器，也可以发给clientadapter，storagaengine，serveradapter；每个组件对应的操作不同，但是指令应该是相同的。
+	CMD_STORAGE_CREATE_IMAGE  = "storage_create_image"  //command create image on storage server side.创建镜像  -- 该命令可以发给服务器，也可以发给clientadapter，storagaengine，serveradapter；每个组件对应的操作不同，但是指令应该是相同的。
+	CMD_STORAGE_CLEAR_STAGE   = "storage_clear_stage"   //command clear stage on storage server side.  -- 指向为存储服务器清理stage
+	CMD_CLEAR_STAGE           = "clear_stage"           //command clear stage
 	CMD_IMAGE_STAGE           = "image_stage"           //对stage制作镜像  -- 返回镜像的id及相关信息。 -- 这个只有在备份成功完成后才会需要发送，是否考虑直接与备份体系合成？
 	CMD_CREATE_IMAGE          = "create_image"          //创建镜像的指令
 
@@ -152,23 +157,22 @@ const (
 	CMD_COMMIT      = "commit"     //确认信息，提交信息
 	CMD_CLEARDATA   = "cleardata"  //清除connector端存储的所有数据，包括认证信息，app信息，job信息，policy信息等等。以便于重新进行主机注册
 
-	//CMD_INHERIT = "inherit" //继承，继承之前某个已经存在于服务器中的connector的信息；问题在于，继承而来的数据应该如何获取？
-
-	//CMD_SET_CONNECTORINFO = "setconnectorinfo" //作为cli向connector一次性设置所有server相关信息的方法。将来的客户端或cli的想到可以通过这个命令进行参数设置。
 	CMD_SHOW_AUTH = "showauth" //显示所有的认证相关信息，包括了服务器地址，port，zone，authid，authkey，authcode，以及宿主机的hostid
 
 	CMD_PLUGIN_INFO = "cmd_plugin_info" //传递给plugin的提取对应info的指令，plugin需要返回自身的相应信息。PluginCmdInfo
 
 	CMD_ADAPTER_ADDRESSES = "fcdm_cmd_adapter_address" //传递给adapter获取对应的协议及协议地址的指令
 
-	/****** 第三方主机相关的特殊指令 **************/
-	//CMD_GET_SEARCH_OPTIONS = "get_search_options" //提取所有的检索条件  ---- 问题在于，检索条件本身可能会出现需要 select的option的现象 -- 如果发生了该现象应该从这个接口获取所有的options
-	//第三方主机的search选项可以考虑直接在pluginconfig中进行配置，配置不同种类的application使用何种类型的检索条件，并指定检索条件的输入方式；唯一不同的是，某些select类型的options不是配置文件配置出来的，而是通过上述指令获取的。
-	//CMD_SEARCH_APPLICATIONS = "search_applications" //根据给定的条件检索应用  ---- 对应的指令应包括检索条件，返回值则为检索出来结果的applications。
+	CMD_ADAPTER_INIT = "fcdm_cmd_adapter_init" //command to init adapter
 
-	CMD_ADAPTER_INIT = "fcdm_cmd_adapter_init" //传递给adapter进行初始化的指令
+	CMD_SADAPTER_ENSUER_STAGE = "sadapter_ensure_stage" //adapter的确认stage的指令
 
-	/*******  存储部分的相关指令   ********/
+	CMD_SADAPTER_CLEAR_STAGE    = "sadapter_clear_stage"    //clear stage command for sadapter
+	CMD_SADAPTER_DELETE_VOLUME  = "sadapter_delete_volume"  //delete supply volume command for sadapter
+	CMD_SADAPTER_LIST_GROUP_IDS = "sadapter_list_group_ids" //delete supply volume command for sadapter
+	CMD_SADAPTER_DELETE_GROUP   = "sadapter_delete_group"   //delete supply volume command for sadapter
+
+	/*******  commands for storage   ********/
 
 	CMD_GET_STORAGE_STATUS = "get_storage_status" //获取storage server中存储的相关信息
 
@@ -185,34 +189,22 @@ const (
 	CMD_STORAGE_CREATE_STAGE    = "storage_create_stage"
 	CMD_STORAGE_DELETE_STAGE    = "storage_delete_stage"
 
-	CMD_STORAGE_SERVER_ENSURE_JOB_STAGE = "storage_server_ensure_job_stage" //向存储服务器发送确认job的stage的命令
+	CMD_STORAGE_SERVER_ENSURE_JOB_STAGE = "storage_server_ensure_job_stage" //server send ensure stage command to storage
 
-	CMD_ADD_POLICY    = "add_policy"    //增加policy  server向connector发送的指令
-	CMD_SAVE_POLICY   = "save_policy"   //增加policy  server向connector发送的指令
-	CMD_MODIFY_POLICY = "modify_policy" //修改policy  server向connector发送的指令
-	CMD_DELETE_POLICY = "delete_policy" //删除policy server向connector发送的指令
-	CMD_RUN_POLICY    = "run_policy"    //运行policy  server向connector发送的指令
-
-	CMD_POLICY_TRIGGERED  = "policy_triggered"   //policy触发后发送的指令
-	CMD_JOB_STATUS_CHANGE = "job_status_change"  //状态变化
-	CMD_JOB_RETRY_CHANGE  = "job_retry_change"   //job的retry的状态变化
-	CMD_HOST_JOB_START    = "host_job_start"     //从connector发送到server端的jobstart指令，该指令通知server jobstart的同时，从server要求job执行的必要信息；同时，如果job为一个appgroup的应用的话，server需要判断是否需要向不同的主机发送jobstart的指令
-	CMD_SERVER_RUN_JOB    = "server_run_job"     //从server端向conenctor发送的jobstart指令，用于在代理host通知server启动job后，server向job需要执行的connector发送jobstart的指令。事实上，这个需要的是
-	CMD_SERVER_JOB_CANCEL = "server_job_cancel"  //从server端向conenctor发送的job cancel指令，用于在代理host通知server启动job后，server向job需要执行的connector发送jobstart的指令。事实上，这个需要的是
-	CMD_JOB_GET_STATUS    = "cmd_job_get_status" //从server端向conenctor发送的job cancel指令，用于在代理host通知server启动job后，server向job需要执行的connector发送jobstart的指令。事实上，这个需要的是
-
-	CMD_HOST_JOBLIMIT_GET = "cmd_host_joblimit_get" //从server向主机发送的提取主机同时运行任务数的指令
-	CMD_HOST_JOBLIMIT_SET = "cmd_host_joblimit_set" //从server向主机发送的设置主机同时运行任务数的指令
-
-	CMD_HOST_DATA_SYNC   = "host_data_sync"   //从主机端向server同步数据的指令
-	CMD_SERVER_DATA_SYNC = "server_data_sync" //从server向主机端同步数据的指令
+	CMD_STORAGE_GET_METADATA = "storage_get_metadata" //GET METADATA from storage engine
+	CMD_COPY_IMAGE           = "storage_copy_image"   //storage engine copy image from input.
 )
 
-/*
-*
+const (
+	CLI_CMD_VERSION        = "version" //used for pefile to show version in cli
+	CLI_CMD_VERSION_SHORT  = "v"       //used for pefile to show version in cli
+	CLI_CMD_VERSION_MIDDLE = "ver"     //used fo pefile to show version in cli
 
-	The type of list app, used in the ListAppRequest and ListAppResponse.
-*/
+	CLI_CMD_INSTALL   = "install"
+	CLI_CMD_UNINSTALL = "uninstall"
+)
+
+// The type of list app, used in the ListAppRequest and ListAppResponse.
 type ListAppType = string
 
 const (
@@ -222,15 +214,11 @@ const (
 	LIST_APP_TYPE_TREE ListAppType = "tree"
 )
 
-/*
-*
-
-	存储通讯协议的自定义type及其对应的函数和常量。
-*/
+// The storage protocols.
 type StorageProtocol = string
 
 const (
-	STORAGE_PROTOCOLS = "protocols" //配置文件中标志多协议的字符串标志
+	STORAGE_PROTOCOLS = "protocols" //protocls name in config files
 
 	STORAGE_PROTOCOL_ISCSI StorageProtocol = "iscsi"
 	STORAGE_PROTOCOL_ISER  StorageProtocol = "iser"
@@ -248,11 +236,8 @@ const (
 
 type JobStep = string
 
-//func (step *JobStep) String() string {
-//	return string(*step)
-//}
-
-// 定义一个全部job类型与对应的阶段的统一变量，以便后续引用
+// a job type-step map, include backup,mount,restore jobtype.
+// every job type has multi steps.
 var JobTypeStepMap = map[string][]JobStep{
 	JOB_TYPE_BACKUP:  {BACKUP_STEP_INIT, BACKUP_STEP_PREPARE, BACKUP_STEP_FREEZE, BACKUP_STEP_THAW, BACKUP_STEP_FINAL, BACKUP_STEP_CANCEL},
 	JOB_TYPE_MOUNT:   {MOUNT_STEP_BEFORE, MOUNT_STEP_AFTER, UMOUNT_STEP_BEFORE, UMOUNT_STEP_AFTER},
@@ -260,7 +245,7 @@ var JobTypeStepMap = map[string][]JobStep{
 }
 
 const (
-	//这些是脚本的step
+	//step for scripts
 	BACKUP_STEP_INIT    JobStep = "backup_init"
 	BACKUP_STEP_PREPARE JobStep = "backup_prepare"
 	BACKUP_STEP_FREEZE  JobStep = "backup_freeze"
@@ -277,17 +262,17 @@ const (
 	RESTORE_STEP_BEFORE JobStep = "beforerestore"
 	RESTORE_STEP_AFTER  JobStep = "afterrestore"
 
-	//这个是为在整体job设计的step，为mainjob的step，不是subjob的step，但是可以标志job运行的阶段
+	//mainjob step
 	JOB_STEP_INIT   JobStep = "jobinit"
 	JOB_STEP_NORMAL JobStep = "jobnormal"
 	JOB_STEP_FINAL  JobStep = "jobfinal"
 	JOB_STEP_CANCEL JobStep = "jobcancel"
 	JOB_STEP_UMOUNT JobStep = "jobumount"
 
-	JOB_STEP_FINISHED JobStep = "jobfinished" //一个特殊的阶段，标志任务已经结束，并不是运行中会产生的实际的阶段
+	JOB_STEP_FINISHED JobStep = "jobfinished" //special job step， means the mainjob is finished.
 )
 
-type JobType = string //工作类型
+type JobType = string //JobType for subjob and mainjob
 
 const (
 	JOB_TYPE_BACKUP  JobType = "backup"
@@ -295,25 +280,20 @@ const (
 	JOB_TYPE_RESTORE JobType = "restore"
 	JOB_TYPE_COPY    JobType = "copy"
 
-	//umount类型的job，主要用于subjob的umount类型的处理
-	JOB_TYPE_UMOUNT JobType = "umount"
+	JOB_TYPE_UMOUNT JobType = "umount" //only for subjob
 
-	JOB_TYPE_RECEIVE JobType = "receive" //复制策略中的接收任务
+	JOB_TYPE_RECEIVE JobType = "receive" //only for subjob
 )
 
-/*
-*
-
-	使用的存储类型。指向为stage（舞台）的类型
-*/
-type StageType = string
+type StageType = string //type for job stage
 
 const (
-	STAGE_TYPE_VOLUME      StageType = "volume"      //卷格式，一般来说意味着多个blockdevice
-	STAGE_TYPE_BLOCKDEVICE StageType = "blockdevice" //单个的块设备
-	STAGE_TYPE_FILESYSTEM  StageType = "filesystem"  //文件系统
+	STAGE_TYPE_VOLUME      StageType = "volume"      //volume
+	STAGE_TYPE_BLOCKDEVICE StageType = "blockdevice" //one blockdevice
+	STAGE_TYPE_FILESYSTEM  StageType = "filesystem"  //filesystem
 )
 
+// the type for StorageAdapter
 type AdapterType = string
 
 const (
@@ -321,58 +301,17 @@ const (
 	ADAPTER_TYPE_INITIATOR AdapterType = "initiator"
 )
 
-/*
-主机类型。
-  主机对应的宿主机的问题：
-*/
-
-//const (
-//	HOST_TYPE = "host_type" //配置文件中主机类型的配置字符串key
-//
-//	HOST_TYPE_STORAGESERVER = "StorageServer" //存储服务器  --  是否要列在主机列表中？？？
-//
-//	HOST_TYPE_LOCAL      = "local"      //本地主机，如果为nil或空字符串也是表示本地主机，默认的主机类型
-//	HOST_TYPE_REMOTE     = "remote"     //远端主机，通过telnet，ssh等协议进行连接的远程主机
-//	HOST_TYPE_VSPHERE    = "vsphere"    //esxi主机，通过esxi接口进行访问的主机
-//	HOST_TYPE_VCENTER    = "vcenter"    //vcenter主机，通过vcenter接口进行访问的主机
-//	HOST_TYPE_KVMHOST    = "kvmhost"    //标准的kvm宿主机，connector通过远程进行连接的kvm宿主机
-//	HOST_TYPE_HYPERVHOST = "hypervhost" //标准的hyperv宿主机，connector通过远程连接连接宿主机
-//)
-
 const (
 	JOB_PERCENT_PREFIX = "##FCDM JOB PERCENT"
 )
 
-//type PluginConfigOption = string
-//
-//const (
-//	PLUGIN_CONFIG_PROVIDER_ALLOW_CUSTOM PluginConfigOption = "FCDM_PROVIDER_AllowCustom" //是否允许进行自定义的选项的选项名，只有设置为true的时候才可以进行应用自定义
-//)
-
-/*
-根据主机类型的分析结果，主机类型对应的配置选项
-这是一个事实上的常量，所以，对应的type不使用指针作为成员
-
-*/
-//var HOSTTYPE_CONFIGS = map[string][]ConfigConfig{
-//	HOST_TYPE_REMOTE: []ConfigConfig{},
-//}
-//
-//var USER_TYPE_MANAGER = 0
-//var USER_TYPE_CONSUMER = 1
-//
-//func UserIsManager(authcode int) bool {
-//	n := authcode & USER_TYPE_MANAGER
-//	return n == USER_TYPE_MANAGER
-//}
-//func UserIsConsumer(authcode int) bool {
-//	return USER_TYPE_CONSUMER == (authcode & USER_TYPE_CONSUMER)
-//}
-
+// BackupType
+// Used for policy and image.
+// the provider will use it to judge the type of backup action.
 type BackupType = int
 
 const (
-	BACKUP_TYPE_ALL BackupType = 1
-	BACKUP_TYPE_DB  BackupType = 2
-	BACKUP_TYPE_LOG BackupType = 3
+	BACKUP_TYPE_ALL BackupType = 1 //both DB and LOG
+	BACKUP_TYPE_DB  BackupType = 2 //only DB
+	BACKUP_TYPE_LOG BackupType = 3 //only LOG
 )
