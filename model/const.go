@@ -59,6 +59,9 @@ const (
 	//when the jobtype is backup, need use the backup type to ensure the which backup type is running.
 	FCDM_EV_JOB_BACKUP_TYPE = "FCDM_EV_JOB_BACKUP_TYPE"
 
+	//the stage info for job, used for provider instance supply stage to instance host.
+	FCDM_EV_JOB_STAGE_INFO = "FCDM_EV_JOB_STAGE_INFO"
+
 	FCDM_EV_HOST_LISTAPP_PAGE = "FCDM_EV_HOST_LISTAPP_PAGE" //list app page
 	FCDM_EV_HOST_LISTAPP_SIZE = "FCDM_EV_HOST_LISTAPP_SIZE" //list app page size
 	FCDM_EV_HOST_LISTAPP_TYPE = "FCDM_EV_HOST_LISSAPP_TYPE" //list app type
