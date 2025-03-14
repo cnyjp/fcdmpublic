@@ -228,6 +228,10 @@ func (t *Time) ToLocalTime(location *time.Location) *time.Time {
 	if nil == t {
 		return nil
 	}
+	if nil == location {
+		return nil
+	}
+
 	tt, err := time.ParseInLocation(timeFormat, t.String(), location)
 
 	if nil != err {
@@ -293,4 +297,71 @@ type ScriptSet struct {
 	Name    string   `json:"name"`           //script name, the filename for the script.
 	Timeout int      `json:"timeout"`        //script execute timeout, zero for none timeout.
 	Args    []string `json:"args,omitempty"` //script execute args.
+}
+
+type StorageInterface struct {
+	Id                 string            `json:"id,omitempty"`                 //need not set when discover
+	HostId             string            `json:"hostId,omitempty"`             //need not set when discover
+	ProviderInstanceId string            `json:"providerInstanceId,omitempty"` //need not set when discover
+	Protocol           StorageProtocol   `json:"protocol,omitempty"`           //storage protocol, iscsi,iser,fc,ib,nfs and so on.
+	AdapterType        AdapterType       `json:"adapterType,omitempty"`        //target or initiator
+	Address            string            `json:"address,omitempty"`            //target address or initiator name.
+	TargetAddress      string            `json:"targetAddress"`                //access address for target interface
+	Options            map[string]string `json:"options"`                      //for some protocol, need options. such as：iscsi use chap,usename,password
+	Configs            []ConfigConfig    `json:"configs"`                      //configs for interface，
+}
+
+/*
+StorageEngine
+*/
+type StorageEngine struct {
+	Id             string         `json:"id,omitempty"`
+	Name           string         `json:"name,omitempty"`
+	EngineTypeName string         `json:"engineTypeName,omitempty"` //the name of the engine type. if blank, means no storage engine type.
+	PoolConfigs    []ConfigConfig `json:"configs,omitempty"`        //the configs for storage create pool. if the configs is nil, then need not input any param when create pool.
+
+	StageTypes    []StageType `json:"stageTypes,omitempty"`    //which stageType the engine support
+	PoolNeedSpace bool        `json:"poolNeedSpace,omitempty"` //if the storage engine need space when create or modify a storage pool.
+
+	Level int `json:"level"` //Level for storage engine, 0 - full, 1 - archive
+}
+
+type StorageEngineType struct {
+	Name            string         `json:"name,omitempty"`          //name for storage engine type
+	EngineConfigs   []ConfigConfig `json:"engineConfigs,omitempty"` //configs for storage engine
+	PoolConfigs     []ConfigConfig `json:"poolConfigs,omitempty"`   //configs for storage pool
+	StageTypes      []StageType    `json:"stageTypes,omitempty"`    //stage types supported, if the engine type level is 0, need this.
+	PoolNeedSpace   bool           `json:"poolNeedSpace"`           //when create/modify storage pool, is need point the space.
+	CanCreateEngine bool           `json:"canCreateEngine"`         //if the storage engine type can create a new storage engine.
+	Level           int            `json:"level"`                   //storage engine level -- 0 full, 1 archive
+
+}
+
+type StoragePool struct {
+	Id      string            `json:"id,omitempty"`
+	Name    string            `json:"name,omitempty"`
+	Options map[string]string `json:"options,omitempty"`
+}
+
+type StorageEngineStatus struct {
+	MaxSize      int64             `json:"maxSize"`  //max size of storage engine
+	UsedSize     int64             `json:"usedSize"` //used size of storage engine
+	Options      map[string]string `json:"options,omitempty"`
+	AllSpaces    []StorageSpace    `json:"allSpaces"`    //all spaces
+	ValidSpaces  []StorageSpace    `json:"validSpaces"`  //spaces can add
+	UsedSpaces   []StorageSpace    `json:"usedSpaces"`   //used spaces
+	StoragePools []StoragePool     `json:"storagePools"` //已建立的存储池
+	StatusTime   time.Time         `json:"statusTime"`   //time for status get
+}
+
+type StorageSpace struct {
+	Name      string            `json:"name"`              //space name
+	Identity  string            `json:"identity"`          //space identity
+	Path      string            `json:"path"`              //space path
+	Username  string            `json:"username"`          //usename
+	Password  string            `json:"password"`          //password
+	Size      int64             `json:"size"`              //space total size
+	BlockSize int32             `json:"blockSize"`         //space block size, optional
+	Options   map[string]string `json:"options,omitempty"` //space options
+	IsMounted bool              `json:"-"`                 //if the space is mounted to another pool.
 }

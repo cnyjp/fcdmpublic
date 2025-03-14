@@ -74,6 +74,18 @@ const (
 	FCDM_EV_TREELIST_NODE_ID            = "FCDM_EV_TREELIST_NODE_ID"            //the tree node to list it's children, empty means root node
 	FCDM_EV_RESTORE_NODE_IDENTITIES     = "FCDM_EV_RESTORE_NODE_IDENTITIES"     //the node identities to restore
 	FCDM_EV_TREELIST_DATA_FILTER_PREFIX = "FCDM_EV_TREELIST_DATA_FILTER_PREFIX" //the search condition for tree list data prefix
+
+	//for storage engine
+	FCDM_EV_ENGINE_ID             = "FCDM_EV_ENGINE_ID"       //the storage engine id
+	FCDM_EV_ENGINE_OPTIONS_PREFIX = "FCDM_EV_ENGINE_OPTIONS_" //the options prefix for engine create or modify
+
+	FCDM_EV_ENGINE_POOL_ID                  = "FCDM_EV_ENGINE_POOL_ID"       //pool id in env
+	FCDM_EV_ENGINE_POOL_OPTIONS_PREFIX      = "FCDM_EV_ENGINE_POOL_OPTIONS_" //the options prefix for pool create or modify
+	FCDM_EV_ENGINE_POOL_SPACE_USED_PREFIX   = "FCDM_EV_ENGINE_POOL_SPACE_USED_"
+	FCDM_EV_ENGINE_POOL_SPACE_ADD_PREFIX    = "FCDM_EV_ENGINE_POOL_SPACE_ADD_"
+	FCDM_EV_ENGINE_POOL_SPACE_REMOVE_PREFIX = "FCDM_EV_ENGINE_POOL_SPACE_REMOVE_"
+	FCDM_EV_ENGINE_POOL_SPACE_LOG_PREFIX    = "FCDM_EV_ENGINE_POOL_LOG_REMOVE_"
+	FCDM_EV_ENGINE_POOL_SPACE_CACHE_PREFIX  = "FCDM_EV_ENGINE_POOL_CACHE_REMOVE_"
 )
 
 const (
@@ -122,9 +134,10 @@ const (
 	CMD_STORAGE_PREPARE_STAGE = "storage_prepare_stage" //command prepare stage on storage server side.  -- 该命令可以发给服务器，也可以发给clientadapter，storagaengine，serveradapter；每个组件对应的操作不同，但是指令应该是相同的。
 	CMD_STORAGE_CREATE_IMAGE  = "storage_create_image"  //command create image on storage server side.创建镜像  -- 该命令可以发给服务器，也可以发给clientadapter，storagaengine，serveradapter；每个组件对应的操作不同，但是指令应该是相同的。
 	CMD_STORAGE_CLEAR_STAGE   = "storage_clear_stage"   //command clear stage on storage server side.  -- 指向为存储服务器清理stage
-	CMD_CLEAR_STAGE           = "clear_stage"           //command clear stage
-	CMD_IMAGE_STAGE           = "image_stage"           //对stage制作镜像  -- 返回镜像的id及相关信息。 -- 这个只有在备份成功完成后才会需要发送，是否考虑直接与备份体系合成？
-	CMD_CREATE_IMAGE          = "create_image"          //创建镜像的指令
+
+	CMD_CLEAR_STAGE  = "clear_stage"  //command clear stage
+	CMD_IMAGE_STAGE  = "image_stage"  //对stage制作镜像  -- 返回镜像的id及相关信息。 -- 这个只有在备份成功完成后才会需要发送，是否考虑直接与备份体系合成？
+	CMD_CREATE_IMAGE = "create_image" //创建镜像的指令
 
 	CMD_GETINITIRTORS = "getinitiators" //发现客户端备份接口的指令
 	CMD_GETTARGETS    = "gettargets"    //发现存储服务器存储接口的指令
@@ -139,15 +152,12 @@ const (
 	CMD_ADAPTER_CLEAR_STAGE        = "adapter_clear_stage"        //客户端的adapter清理stage
 	CMD_ADAPTER_CLEAR_STALE_DEVICE = "adapter_clear_stale_device" //客户端的adapter呆设备(无用挂载)
 
-	//第三方主机相关的增补指令
+	//third host commands
 	CMD_HOST_LIST_APP              = "host_list_app"
 	CMD_HOST_LIST_APP_SECONDLYTYPE = "host_list_app_secondlytype"
 	CMD_HOST_LIST_APP_OPTION       = "host_list_app_option"
 
-	//connector与server之间的通讯指令
-	CMD_REGISTER = "register" //connector注册到服务器的指令
-
-	CMD_UPDAET_IMAGE_INFO = "update_image_info" //connector备份完成后获取到对应的image的附加信息，将该附加信息返回给服务器端 ---- 似乎不是很有必要，只需要在备份完成的通知中将image的信息加进去就好了。todo:待验证。
+	CMD_HOST_DISCOVER_STORAGE_INTERFACE = "host_discover_storage_interface" //discover storage interface on provider instance
 
 	//connector端的指令
 	CMD_SET_AUTH   = "setauth"   //设置认证信息
@@ -174,25 +184,30 @@ const (
 
 	/*******  commands for storage   ********/
 
-	CMD_GET_STORAGE_STATUS = "get_storage_status" //获取storage server中存储的相关信息
+)
 
-	CMD_STORAGE_ADD_POOL        = "storage_add_pool"
-	CMD_STORAGE_MODIFY_POOL     = "storage_modify_pool"
-	CMD_STORAGE_DELETE_POOL     = "storage_delete_pool"
-	CMD_STORAGE_LIST_POOL       = "storage_list_pool"
-	CMD_STORAGE_INFO_POOL       = "storage_info_pool"
-	CMD_STORAGE_ADD_COPY        = "storage_add_copy"
-	CMD_STORAGE_MODIFY_COPY     = "storage_modify_copy"
-	CMD_STORAGE_DELETE_COPY     = "storage_delete_copy"
-	CMD_STORAGE_CREATE_SNAPSHOT = "storage_create_snapshot"
-	CMD_STORAGE_DELETE_SNAPSHOT = "storage_delete_snapshot"
-	CMD_STORAGE_CREATE_STAGE    = "storage_create_stage"
-	CMD_STORAGE_DELETE_STAGE    = "storage_delete_stage"
+const (
+	//commands for storageEngineType
+	CMD_STORAGE_ENGINE_TYPE_INIT = "storage_engine_type_init" //init command for storage engine or engine type. Used when storage server start to init storage engine.
+	CMD_STORAGE_ENGINE_TYPE_INFO = "storage_engine_type_info" //the info command for storage engine or engine type.Used when get the engine info.
+	//CMD_STORAGE_ENGINE_TYPE_CREATE_ENGINE        = "storage_engine_type_create_engine"        //create storage engine command for storage engine type
+	CMD_STORAGE_ENGINE_TYPE_MODIFY_ENGINE        = "storage_engine_type_modify_engine"        //create storage engine command for storage engine type
+	CMD_STORAGE_ENGINE_TYPE_DELETE_ENGINE        = "storage_engine_type_delete_engine"        //create storage engine command for storage engine type
+	CMD_STORAGE_ENGINE_TYPE_CHECK_ENGINE_OPTIONS = "storage_engine_type_check_engine_options" //check the create engine options for enginetype
 
-	CMD_STORAGE_SERVER_ENSURE_JOB_STAGE = "storage_server_ensure_job_stage" //server send ensure stage command to storage
+	//command for storage engine
+	CMD_STORAGE_ENGINE_INIT               = "storage_engine_init"               //init command for storage engine or engine type. Used when storage server start to init storage engine.
+	CMD_STORAGE_ENGINE_INFO               = "storage_engine_info"               //the info command for storage engine or engine type.Used when get the engine info.
+	CMD_STORAGE_ENGINE_STATUS             = "storage_engine_status"             //the status command for storage engine or engine type.Used when get the engine status.
+	CMD_STORAGE_ENGINE_CHECK_POOL_OPTIONS = "storage_engine_check_pool_options" //check the engine options can create a valid engine
+	CMD_STORAGE_ENGINE_CREATE_POOL        = "storage_engine_create_pool"        //check the engine options can create a valid engine
+	CMD_STORAGE_ENGINE_MODIFY_POOL        = "storage_engine_modify_pool"        //check the engine options can create a valid engine
+	CMD_STORAGE_ENGINE_DELETE_POOL        = "storage_engine_delete_pool"        //check the engine options can create a valid engine
+	CMD_STORAGE_ENGINE_GET_POOL_INFO      = "storage_engine_get_pool_info"      //get pool info, include size, spaces. If the pool not exist, return the valid spaces.
 
-	CMD_STORAGE_GET_METADATA = "storage_get_metadata" //GET METADATA from storage engine
-	CMD_COPY_IMAGE           = "storage_copy_image"   //storage engine copy image from input.
+	//command for storage engine pool
+	CMD_STORAGE_ENGINE_POOL_ENSURE_VOLUME = "storage_engien_pool_ensure_volume"
+	CMD_STORAGE_ENGINE_POOL_DELETE_VOLUME = "storage_engine_pool_delete_volume"
 )
 
 const (
@@ -299,6 +314,11 @@ type AdapterType = string
 const (
 	ADAPTER_TYPE_TARGET    AdapterType = "target"
 	ADAPTER_TYPE_INITIATOR AdapterType = "initiator"
+)
+
+const (
+	PLUGIN_OUTPUT_PREFIX_SUBLOG = "##FCDM_PLUGIN_OUTPUT_SUBLOG::" //if a plugin want output a log message saved on server side, use this prefix
+
 )
 
 const (

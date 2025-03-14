@@ -6,12 +6,13 @@ import (
 	"strings"
 )
 
-/**
+/*
   Some common func.
 */
 
-/**
-  trans the bytes to props like map[string]string
+/*
+GetProps
+trans the bytes to props as map[string]string
 */
 func GetProps(ab []byte) map[string]string {
 	props := map[string]string{}
@@ -41,8 +42,9 @@ func GetProps(ab []byte) map[string]string {
 	return props
 }
 
-/**
-  if the path exist, no matter the path is a file or dir, will return true.
+/*
+PathExists
+if the path exist, no matter the path is a file or dir, will return true.
 */
 func PathExists(path string) (bool, error) {
 
@@ -56,17 +58,22 @@ func PathExists(path string) (bool, error) {
 	return false, err
 }
 
-/**
-  if the file exist, only file.
+var ErrPathIsFile error = errors.New("path is file")
+var ErrPathIsDir error = errors.New("path is dir")
+var ErrPathIsEmpty = errors.New("path is empty")
+
+/*
+FileExists
+if the file exist, only file.
 */
 func FileExists(path string) (bool, error) {
 	if len(path) == 0 {
-		return false, errors.New("path is empty")
+		return false, ErrPathIsEmpty
 	}
 	info, err := os.Stat(path)
 	if err == nil {
 		if info.IsDir() {
-			return false, errors.New("path is a directory, not a file")
+			return false, ErrPathIsDir
 		}
 		return true, nil
 	}
@@ -76,8 +83,9 @@ func FileExists(path string) (bool, error) {
 	return false, err
 }
 
-/**
-  if the dir exist, only dir.
+/*
+DirExists
+if the dir exist, only dir.
 */
 func DirExists(path string) (bool, error) {
 	if len(path) == 0 {
@@ -88,10 +96,49 @@ func DirExists(path string) (bool, error) {
 		if info.IsDir() {
 			return true, nil
 		}
-		return false, errors.New("path is not a directory")
+		return false, ErrPathIsFile
 	}
 	if os.IsNotExist(err) {
 		return false, nil
 	}
 	return false, err
+}
+
+// RemoveSliceElementByIndex
+// remove an element from slice by its index
+func RemoveSliceElementByIndex[E any](slice []E, index int) []E {
+	if index >= 0 && index < len(slice) {
+		return append(slice[:index], slice[index+1:]...)
+	} else {
+		return slice
+	}
+}
+
+// RemoveOneSliceElementByElement
+// Remove an element from slice
+func RemoveOneSliceElementByElement[E comparable](slice []E, ele E) []E {
+	for i, e := range slice {
+		if e == ele {
+			return append(slice[:i], slice[i+1:]...)
+		}
+	}
+	return slice
+}
+
+func RemoveAllSliceElementsByElements[E comparable](slice []E, eles ...E) []E {
+	temp := []E{}
+	for _, e := range slice {
+		needadd := true
+		for _, ele := range eles {
+			if e == ele {
+				needadd = false
+				break
+			}
+		}
+		if needadd {
+			temp = append(temp, e)
+		}
+	}
+	return temp
+
 }

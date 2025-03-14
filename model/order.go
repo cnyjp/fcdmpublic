@@ -2,7 +2,6 @@ package model
 
 /*
 BackupResponse
-
 The struct used by provider backup command.
 When the provider run backup command and return a special code, will use the BackupResponse struct to unmarshal
 the last line printed by the provider.
@@ -21,7 +20,7 @@ type BackupResponse struct {
 ListAppResponse
 The struct used by provider list_app command.
 When the provider run list_app command and return a zero code, will use the struct to unmarshal the last line
-print by the provider.
+printed by the provider.
 */
 type ListAppResponse struct {
 	HostId             string            `json:"hostId,omitempty"`
