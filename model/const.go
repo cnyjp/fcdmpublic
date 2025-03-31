@@ -79,11 +79,13 @@ const (
 	FCDM_EV_TREELIST_DATA_FILTER_PREFIX = "FCDM_EV_TREELIST_DATA_FILTER_PREFIX" //the search condition for tree list data prefix
 
 	//for storage engine
-	FCDM_EV_ENGINE_ID             = "FCDM_EV_ENGINE_ID"       //the storage engine id
-	FCDM_EV_ENGINE_OPTIONS_PREFIX = "FCDM_EV_ENGINE_OPTIONS_" //the options prefix for engine create or modify
+	FCDM_EV_ENGINE_ID                 = "FCDM_EV_ENGINE_ID"           //the storage engine id
+	FCDM_EV_ENGINE_OPTIONS_PREFIX     = "FCDM_EV_ENGINE_OPTIONS_"     //the options prefix for engine create or modify
+	FCDM_EV_ENGINE_OLD_OPTIONS_PREFIX = "FCDM_EV_ENGINE_OLD_OPTIONS_" //the options prefix for engine create or modify
 
-	FCDM_EV_ENGINE_POOL_ID                  = "FCDM_EV_ENGINE_POOL_ID"       //pool id in env
-	FCDM_EV_ENGINE_POOL_OPTIONS_PREFIX      = "FCDM_EV_ENGINE_POOL_OPTIONS_" //the options prefix for pool create or modify
+	FCDM_EV_ENGINE_POOL_ID                  = "FCDM_EV_ENGINE_POOL_ID"           //pool id in env
+	FCDM_EV_ENGINE_POOL_OPTIONS_PREFIX      = "FCDM_EV_ENGINE_POOL_OPTIONS_"     //the options prefix for pool create or modify
+	FCDM_EV_ENGINE_POOL_OLD_OPTIONS_PREFIX  = "FCDM_EV_ENGINE_OLD_POOL_OPTIONS_" //the options prefix for pool create or modify
 	FCDM_EV_ENGINE_POOL_SPACE_USED_PREFIX   = "FCDM_EV_ENGINE_POOL_SPACE_USED_"
 	FCDM_EV_ENGINE_POOL_SPACE_ADD_PREFIX    = "FCDM_EV_ENGINE_POOL_SPACE_ADD_"
 	FCDM_EV_ENGINE_POOL_SPACE_REMOVE_PREFIX = "FCDM_EV_ENGINE_POOL_SPACE_REMOVE_"
@@ -194,14 +196,18 @@ const (
 	CMD_STORAGE_ENGINE_TYPE_INIT = "storage_engine_type_init" //init command for storage engine or engine type. Used when storage server start to init storage engine.
 	CMD_STORAGE_ENGINE_TYPE_INFO = "storage_engine_type_info" //the info command for storage engine or engine type.Used when get the engine info.
 	//CMD_STORAGE_ENGINE_TYPE_CREATE_ENGINE        = "storage_engine_type_create_engine"        //create storage engine command for storage engine type
-	CMD_STORAGE_ENGINE_TYPE_MODIFY_ENGINE        = "storage_engine_type_modify_engine"        //create storage engine command for storage engine type
-	CMD_STORAGE_ENGINE_TYPE_DELETE_ENGINE        = "storage_engine_type_delete_engine"        //create storage engine command for storage engine type
-	CMD_STORAGE_ENGINE_TYPE_CHECK_ENGINE_OPTIONS = "storage_engine_type_check_engine_options" //check the create engine options for enginetype
+	//CMD_STORAGE_ENGINE_TYPE_MODIFY_ENGINE        = "storage_engine_type_modify_engine"        //create storage engine command for storage engine type
+	//CMD_STORAGE_ENGINE_TYPE_DELETE_ENGINE        = "storage_engine_type_delete_engine"        //create storage engine command for storage engine type
+	//CMD_STORAGE_ENGINE_TYPE_CHECK_ENGINE_OPTIONS = "storage_engine_type_check_engine_options" //check the create engine options for enginetype
 
 	//command for storage engine
-	CMD_STORAGE_ENGINE_INIT               = "storage_engine_init"               //init command for storage engine or engine type. Used when storage server start to init storage engine.
-	CMD_STORAGE_ENGINE_INFO               = "storage_engine_info"               //the info command for storage engine or engine type.Used when get the engine info.
-	CMD_STORAGE_ENGINE_STATUS             = "storage_engine_status"             //the status command for storage engine or engine type.Used when get the engine status.
+	CMD_STORAGE_ENGINE_CREATE             = "storage_engine_create" //init command for storage engine or engine type. Used when storage server create a new storage engine.
+	CMD_STORAGE_ENGINE_MODIFY             = "storage_engine_modify" //init command for storage engine or engine type. Used when storage server start to init storage engine.
+	CMD_STORAGE_ENGINE_INIT               = "storage_engine_init"   //init command for storage engine or engine type. Used when storage server start to init storage engine.
+	CMD_STORAGE_ENGINE_INFO               = "storage_engine_info"   //the info command for storage engine or engine type.Used when get the engine info.
+	CMD_STORAGE_ENGINE_STATUS             = "storage_engine_status" //the status command for storage engine or engine type.Used when get the engine status.
+	CMD_STORAGE_ENGINE_DELETE             = "storage_engine_delete" //the delete command for storage engine or engine type.Used when delete engine
+	CMD_STORAGE_ENGINE_CHECK_OPTIONS      = "storage_engine_check_options"
 	CMD_STORAGE_ENGINE_CHECK_POOL_OPTIONS = "storage_engine_check_pool_options" //check the engine options can create a valid engine
 	CMD_STORAGE_ENGINE_CREATE_POOL        = "storage_engine_create_pool"        //check the engine options can create a valid engine
 	CMD_STORAGE_ENGINE_MODIFY_POOL        = "storage_engine_modify_pool"        //check the engine options can create a valid engine
