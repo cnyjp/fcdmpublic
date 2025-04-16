@@ -91,6 +91,10 @@ const (
 	FCDM_EV_ENGINE_POOL_SPACE_REMOVE_PREFIX = "FCDM_EV_ENGINE_POOL_SPACE_REMOVE_"
 	FCDM_EV_ENGINE_POOL_SPACE_LOG_PREFIX    = "FCDM_EV_ENGINE_POOL_LOG_REMOVE_"
 	FCDM_EV_ENGINE_POOL_SPACE_CACHE_PREFIX  = "FCDM_EV_ENGINE_POOL_CACHE_REMOVE_"
+
+	FCDM_EV_ENGINE_POOL_VOLUME_INFO           = "FCDM_EV_ENGINE_POOL_VOLUME_INFO"           //volume full information for storage engine and engine type.
+	FCDM_EV_ENGINE_POOL_VOLUME_METADATA       = "FCDM_EV_ENGINE_POOL_VOLUME_METADATA"       //volume full metadata for storage engine and engine type.
+	FCDM_EV_ENGINE_POOL_VOLUME_METADATA_ACTOR = "FCDM_EV_ENGINE_POOL_VOLUME_METADATA_ACTOR" //volume metadata actor for storage engine and engine type.
 )
 
 const (
@@ -212,11 +216,23 @@ const (
 	CMD_STORAGE_ENGINE_CREATE_POOL        = "storage_engine_create_pool"        //check the engine options can create a valid engine
 	CMD_STORAGE_ENGINE_MODIFY_POOL        = "storage_engine_modify_pool"        //check the engine options can create a valid engine
 	CMD_STORAGE_ENGINE_DELETE_POOL        = "storage_engine_delete_pool"        //check the engine options can create a valid engine
+	CMD_STORAGE_ENGINE_LIST_POOL          = "storage_engine_list_pool"          //check the engine options can create a valid engine
 	CMD_STORAGE_ENGINE_GET_POOL_INFO      = "storage_engine_get_pool_info"      //get pool info, include size, spaces. If the pool not exist, return the valid spaces.
 
 	//command for storage engine pool
-	CMD_STORAGE_ENGINE_POOL_ENSURE_VOLUME = "storage_engien_pool_ensure_volume"
-	CMD_STORAGE_ENGINE_POOL_DELETE_VOLUME = "storage_engine_pool_delete_volume"
+	CMD_STORAGE_ENGINE_POOL_ENSURE_VOLUME                  = "storage_engien_pool_ensure_volume"
+	CMD_STORAGE_ENGINE_POOL_RETRIEVE_VOLUME                = "storage_engien_pool_retrieve_volume"
+	CMD_STORAGE_ENGINE_POOL_DELETE_VOLUME                  = "storage_engine_pool_delete_volume"
+	CMD_STORAGE_ENGINE_POOL_LIST_VOLUME                    = "storage_engine_pool_list_volume"
+	CMD_STORAGE_ENGINE_POOL_COUNT_VOLUME_METADATA          = "storage_engine_pool_count_volume_metadata"
+	CMD_STORAGE_ENGINE_POOL_GET_VOLUME_METADATA_READER     = "storage_engine_pool_get_volume_metadata_reader"
+	CMD_STORAGE_ENGINE_POOL_READ_VOLUME                    = "storage_engine_pool_read_volume"
+	CMD_STORAGE_ENGINE_POOL_RELEASE_VOLUME_METADATA_READER = "storage_engine_pool_release_volume_metadata_reader"
+	CMD_STORAGE_ENGINE_POOL_GET_VOLUME_METADATA_WRITER     = "storage_engine_pool_get_volume_metadata_writer"
+	CMD_STORAGE_ENGINE_POOL_WRITE_VOLUME                   = "storage_engine_pool_write_volume"
+	CMD_STORAGE_ENGINE_POOL_RELEASE_VOLUME_METADATA_WRITER = "storage_engine_pool_release_volume_metadata_writer"
+
+	CMD_STORAGE_ENGINE_POOL_SUMMARY_VOLUME = "storage_engine_pool_summary_volume" //get a volume summary in the pool
 )
 
 const (
@@ -343,4 +359,14 @@ const (
 	BACKUP_TYPE_ALL BackupType = 1 //both DB and LOG
 	BACKUP_TYPE_DB  BackupType = 2 //only DB
 	BACKUP_TYPE_LOG BackupType = 3 //only LOG
+)
+
+// CopyActor
+// used for copy policy
+// label the copy source or target
+type CopyActor = string
+
+const (
+	COPY_ACTOR_SOURCE CopyActor = "source"
+	COPY_ACTOR_TARGET CopyActor = "target"
 )

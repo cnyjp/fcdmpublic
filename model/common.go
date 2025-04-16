@@ -1,6 +1,7 @@
 package model
 
 import (
+	bytes2 "bytes"
 	"errors"
 	"os"
 	"strings"
@@ -141,4 +142,62 @@ func RemoveAllSliceElementsByElements[E comparable](slice []E, eles ...E) []E {
 	}
 	return temp
 
+}
+
+var defaultSysArgs SysArgs
+
+func GetSysArgs() SysArgs {
+	if nil == defaultSysArgs.Argmap {
+		defaultSysArgs.Argmap = SysArgMap()
+		defaultSysArgs.PeName = os.Args[0]
+		if len(os.Args) > 1 {
+			if strings.Index(os.Args[1], "-") == 0 {
+				defaultSysArgs.Command = ""
+			} else {
+				defaultSysArgs.Command = os.Args[1]
+			}
+		} else {
+			defaultSysArgs.Command = ""
+		}
+	}
+	return defaultSysArgs
+}
+
+// 对命令行字符串进行转义处理
+func EscapeArgString(value string) string {
+	bytes := bytes2.Buffer{}
+	for _, c := range value {
+		if c == '"' {
+			bytes.WriteString("\\")
+		}
+		bytes.WriteByte(byte(c))
+	}
+	return bytes.String()
+}
+
+/*
+解析系统Args，组成为map
+系统args采用统一的格式：
+program {-argname} {argvalue} {-argname2} {argvalue2}
+即：参数名使用-作为前缀，其后的为其参数数值；对于参数数值中有空格或-开头的，使用双引号包含起来；对于双引号中的双引号使用\进行转义；
+同样，\字符本身使用\\进行转义
+
+-help作为一个特殊的命令主体，-help后面的参数将最为命令行-c指令的帮助进行输出。如果没有对应的命令，则直接输出命令行自身的帮助信息。
+*/
+func SysArgMap() map[string]string {
+
+	var hmap = make(map[string]string)
+	var currentname string
+	for index, value := range os.Args {
+		if index == 0 { //第一个参数是程序名，不进行解析
+			continue
+		}
+		if strings.HasPrefix(value, "-") {
+			currentname = strings.TrimPrefix(value, "-")
+			hmap[currentname] = "" //给一个空串的默认值，否则无法承接无参数命令
+			continue
+		}
+		hmap[currentname] = value
+	}
+	return hmap
 }

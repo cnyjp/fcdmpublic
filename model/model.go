@@ -124,7 +124,11 @@ type Volume struct {
 	//Stage properties
 	StageAutoExpand string `json:"stageAutoExpand,omitempty"` //auto expand-- true,false|yes,no|inherited
 
-	StageSize int64 `json:"stageSize,omitempty"` //The stagesize provider want for the volume.
+	StageSize int64 `json:"stageSize,omitempty"` //The stageSize provider want for the volume.
+
+	ImageId             string `json:"imageId,omitempty"`             //image id for volume
+	StoragePoolId       string `json:"storagePoolId,omitempty"`       //pool id for volume
+	StoragePoolEngineId string `json:"storagePoolEngineId,omitempty"` //engine if for pool
 }
 
 //PluginConfig
@@ -318,7 +322,7 @@ type StorageEngine struct {
 	Id             string         `json:"id,omitempty"`
 	Name           string         `json:"name,omitempty"`
 	EngineTypeName string         `json:"engineTypeName,omitempty"` //the name of the engine type. if blank, means no storage engine type.
-	PoolConfigs    []ConfigConfig `json:"configs,omitempty"`        //the configs for storage create pool. if the configs is nil, then need not input any param when create pool.
+	PoolConfigs    []ConfigConfig `json:"poolConfigs,omitempty"`    //the configs for storage create pool. if the configs is nil, then need not input any param when create pool.
 
 	StageTypes    []StageType `json:"stageTypes,omitempty"`    //which stageType the engine support
 	PoolNeedSpace bool        `json:"poolNeedSpace,omitempty"` //if the storage engine need space when create or modify a storage pool.
@@ -338,9 +342,10 @@ type StorageEngineType struct {
 }
 
 type StoragePool struct {
-	Id      string            `json:"id,omitempty"`
-	Name    string            `json:"name,omitempty"`
-	Options map[string]string `json:"options,omitempty"`
+	Id       string            `json:"id,omitempty"`
+	Name     string            `json:"name,omitempty"`
+	EngineId string            `json:"engineId,omitempty"`
+	Options  map[string]string `json:"options,omitempty"`
 }
 
 type StorageEngineStatus struct {
@@ -364,4 +369,86 @@ type StorageSpace struct {
 	BlockSize int32             `json:"blockSize"`         //space block size, optional
 	Options   map[string]string `json:"options,omitempty"` //space options
 	IsMounted bool              `json:"-"`                 //if the space is mounted to another pool.
+}
+
+// the summary for a volume on storage
+type VolumeStorageSummary struct {
+	Status int    `json:"status"`
+	Data   string `json:"data,omitempty"`
+	Detail string `json:"detail,omitempty"`
+}
+
+// CoupleVolumeMetadata
+// @Description: 单一一个卷在copy任务中的metadata，包含了Source和Target
+type CoupleVolumeMetadata struct {
+	Source VolumeMetadata `json:"source,omitempty"`
+	Target VolumeMetadata `json:"target,omitempty"`
+}
+
+// 用于描述 复制 volume 的MetaData的数据结构
+// 异构引擎如何实现差异化复制？
+// 如果是一个归档类型的存储引擎，其自身并不实现存储的格式化，而是直接保留源存储引擎的数据格式，保留和记录源数据引擎的所有metadata，并只是简单进行的数据归档保存
+// 那么，理论上，它是可以实现所有类型存储引擎的差异化复制的。那么，此时提取其metadata，其返回的metadata的数据格式就与原始的引擎完全一致
+// 那么，此时需要对应的metadata提交给存储引擎，由存储引擎进行相应的处理（保存或丢弃）
+// 问题在于，源存储引擎如何判断应该使用自身的数据处理方式进行数据处理呢？
+// 数据引擎判断能否自己处理的方式为：返回的targetMetaData符合自身的数据格式要求，自身解析下能够实现差异处理
+// 但是归档引擎并不具备该处理能力，所以归档引擎应该返回一个特殊的标记，表明自己是一个归档引擎。
+// 同时，归档引擎并不能准确判断不同的存储卷之间的依赖关系，因而无法在进一步的复制中体现卷的依赖关系
+// 如果将一个增量卷向一个全存储引擎进行复制，那么想要全存储引擎能够正常识别和运行该镜像，需要发送一串卷的数据
+// 那么copyproxy中发送的数据结构中就必须要能够表现这些卷的前后顺序以及每个包所属的卷信息
+type VolumeMetadata struct {
+	Id            string `json:"id"`                 //使用ID和poolId，引擎应该很容易找到对应的volume
+	SourceId      string `json:"sourceId,omitempty"` //卷的来源id, 对应在来源的卷中进行数据的比对，看是否具备差异化复制的能力 -- clone的卷需要明确表明自身复制的卷id
+	OriginId      string `json:"originId"`           //卷所对应的原始卷的id
+	ImageId       string `json:"imageId,omitempty"`  //镜像的id
+	StoragePoolId string `json:"storagePoolId"`      //卷所在的存储池的id
+	StageSize     int64  `json:"stageSize"`          //为卷的接收准备的空间大小，由存储引擎进行实际的大小计算
+	BlockSize     int    `json:"blockSize"`          //BlockSize与StageSize为BlockDevice模式的卷需要的参数，在BlockDevice与filesystem转换的复制过程中，如何保证两者的信息不丢失？
+
+	StoragePoolOptions map[string]string `json:"storagePoolOptions,omitempty"` //the pool config options
+
+	StorageStageType StageType `json:"storageStageType"`          //存储端的stageType，这个需要在进行数据获取和处理的时候进行处理和赋值
+	StorageIdentity  string    `json:"storageIdentity,omitempty"` //存储端的实际地址，需要存储引擎在target端的时候给出并返回
+
+	JobId     string `json:"jobId,omitempty"`     //任务id
+	MainjobId string `json:"mainjobId,omitempty"` //主任务id
+
+	EngineName     string `json:"engineName"` //存储引擎的名字，引擎名用于在存储服务器端找到对应的存储引擎
+	EngineId       string `json:"engineId"`   //存储引擎的id，用于在存储服务器端找到对应的存储引擎
+	EngineTypeName string `json:"engineTypeName"`
+	//StorageEngineType runmodel.StorageEngineType `json:"storageEngineType"` //存储引擎type相同的认为是同构引擎，同构引擎可能会生成不同名字的引擎
+	EngineMeta string `json:"engineMeta"` //存储引擎对数据的描述结构，由存储引擎给出，不同的存储引擎给出的数据结构不同
+	//IsArchive         bool              `json:"isArchive,omitempty"` //是否为归档引擎，如果是归档引擎， 是否为归档引擎可以从StorageEngineType的level中判定 level == 1 为归档引擎
+	DependVolumeMetadata *VolumeMetadata `json:"dependVolumeMetadata,omitempty"` //该卷的数据依赖的卷的metadata -- 当卷的数据是 差异 数据的时候，指定其所依赖的卷id
+	//直到最后该数值为nil，表示卷可以独立存在，不依赖于其它的卷
+	MaxSequence uint64 `json:"maxSequence,omitempty"` //最大的sequence,需要进行记录
+}
+
+/*
+系统参数的结构及处理函数
+*/
+type SysArgs struct {
+	Argmap  map[string]string `json:"argmap,omitempty"` //经过命令参数解析后的命令-->参数值的键值对
+	PeName  string            `json:"peName,omitempty"` //命令行命令本身的值，对应os.Args[0]
+	Command string            `json:"command"`          //命令行中指定的命令
+}
+
+func (sysargs *SysArgs) HasHelp() bool {
+	return sysargs.HasCommand("help") || sysargs.HasCommand("h")
+}
+
+func (sysargs *SysArgs) HasVersion() bool {
+	return sysargs.HasCommand("version") || sysargs.HasCommand("v")
+}
+
+// 参数列表中是否有某个命令
+func (sysargs *SysArgs) HasCommand(command string) bool {
+	_, hasvalue := sysargs.Argmap[command]
+	return hasvalue
+}
+
+// 获取参数列表中的某个参数的数据
+func (sysargs *SysArgs) GetCommandValue(command string) (string, bool) {
+	value, hasvalue := sysargs.Argmap[command]
+	return value, hasvalue
 }
