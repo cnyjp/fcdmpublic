@@ -94,6 +94,7 @@ const (
 
 	FCDM_EV_ENGINE_POOL_VOLUME_INFO           = "FCDM_EV_ENGINE_POOL_VOLUME_INFO"           //volume full information for storage engine and engine type.
 	FCDM_EV_ENGINE_POOL_VOLUME_METADATA       = "FCDM_EV_ENGINE_POOL_VOLUME_METADATA"       //volume full metadata for storage engine and engine type.
+	FCDM_EV_ENGINE_POOL_IMAGE_METADATA        = "FCDM_EV_ENGINE_POOL_IMAGE_METADATA"        //volume full metadata for storage engine and engine type.
 	FCDM_EV_ENGINE_POOL_VOLUME_METADATA_ACTOR = "FCDM_EV_ENGINE_POOL_VOLUME_METADATA_ACTOR" //volume metadata actor for storage engine and engine type.
 )
 
@@ -108,10 +109,11 @@ const (
 
 // The special code return by plugins
 const (
-	CODE_RUN_SUCCESS       = 0   //which means the plugin run command succeed.
-	CODE_STAGE_NEED_EXPAND = 201 //which means the stage need expand by default rules.
-	CODE_STAGE_EXPAND_TO   = 202 //which means the stage need expand by return volume data.
-	CODE_DISCOVER          = 203 //which means the provider found application change, need refresh the application's information
+	CODE_RUN_SUCCESS           = 0   //which means the plugin run command succeed.
+	CODE_STAGE_NEED_EXPAND     = 201 //which means the stage need expand by default rules.
+	CODE_STAGE_EXPAND_TO       = 202 //which means the stage need expand by return volume data.
+	CODE_DISCOVER              = 203 //which means the provider found application change, need refresh the application's information
+	CODE_STORAGE_VOLUME_LOCKED = 101 //the volume is locked, when check volume locked return this code.
 )
 
 // command string
@@ -220,17 +222,28 @@ const (
 	CMD_STORAGE_ENGINE_GET_POOL_INFO      = "storage_engine_get_pool_info"      //get pool info, include size, spaces. If the pool not exist, return the valid spaces.
 
 	//command for storage engine pool
-	CMD_STORAGE_ENGINE_POOL_ENSURE_VOLUME                  = "storage_engien_pool_ensure_volume"
-	CMD_STORAGE_ENGINE_POOL_RETRIEVE_VOLUME                = "storage_engien_pool_retrieve_volume"
-	CMD_STORAGE_ENGINE_POOL_DELETE_VOLUME                  = "storage_engine_pool_delete_volume"
-	CMD_STORAGE_ENGINE_POOL_LIST_VOLUME                    = "storage_engine_pool_list_volume"
-	CMD_STORAGE_ENGINE_POOL_COUNT_VOLUME_METADATA          = "storage_engine_pool_count_volume_metadata"
-	CMD_STORAGE_ENGINE_POOL_GET_VOLUME_METADATA_READER     = "storage_engine_pool_get_volume_metadata_reader"
-	CMD_STORAGE_ENGINE_POOL_READ_VOLUME                    = "storage_engine_pool_read_volume"
-	CMD_STORAGE_ENGINE_POOL_RELEASE_VOLUME_METADATA_READER = "storage_engine_pool_release_volume_metadata_reader"
-	CMD_STORAGE_ENGINE_POOL_GET_VOLUME_METADATA_WRITER     = "storage_engine_pool_get_volume_metadata_writer"
-	CMD_STORAGE_ENGINE_POOL_WRITE_VOLUME                   = "storage_engine_pool_write_volume"
-	CMD_STORAGE_ENGINE_POOL_RELEASE_VOLUME_METADATA_WRITER = "storage_engine_pool_release_volume_metadata_writer"
+	CMD_STORAGE_ENGINE_POOL_ENSURE_VOLUME                   = "storage_engien_pool_ensure_volume"
+	CMD_STORAGE_ENGINE_POOL_RETRIEVE_VOLUME                 = "storage_engien_pool_retrieve_volume"
+	CMD_STORAGE_ENGINE_POOL_DELETE_VOLUME                   = "storage_engine_pool_delete_volume"
+	CMD_STORAGE_ENGINE_POOL_LIST_VOLUME                     = "storage_engine_pool_list_volume"
+	CMD_STORAGE_ENGINE_POOL_COUNT_VOLUME_METADATA           = "storage_engine_pool_count_volume_metadata"
+	CMD_STORAGE_ENGINE_POOL_GET_VOLUME_METADATA_READER      = "storage_engine_pool_get_volume_metadata_reader"
+	CMD_STORAGE_ENGINE_POOL_READ_VOLUME                     = "storage_engine_pool_read_volume"
+	CMD_STORAGE_ENGINE_POOL_RELEASE_VOLUME_METADATA_READER  = "storage_engine_pool_release_volume_metadata_reader"
+	CMD_STORAGE_ENGINE_POOL_GET_VOLUME_METADATA_WRITER      = "storage_engine_pool_get_volume_metadata_writer"
+	CMD_STORAGE_ENGINE_POOL_WRITE_VOLUME                    = "storage_engine_pool_write_volume"
+	CMD_STORAGE_ENGINE_POOL_COMMIT_VOLUME_METADATA_WRITER   = "storage_engine_pool_commit_volume_metadata_writer"
+	CMD_STORAGE_ENGINE_POOL_ROLLBACK_VOLUME_METADATA_WRITER = "storage_engine_pool_rollback_volume_metadata_writer"
+	CMD_STORAGE_ENGINE_POOL_BACKUP_COMMIT_VOLUME            = "storage_engine_pool_backup_commit_volume"
+	CMD_STORAGE_ENGINE_POOL_UNLOCK_VOLUME                   = "storage_engine_pool_unlock_volume"
+	CMD_STORAGE_ENGINE_POOL_BACKUP_CHECK_AND_LOCK_VOLUME    = "storage_engine_pool_backup_check_and_lock_volume"
+	CMD_STORAGE_ENGINE_POOL_BACKUP_ROLLBACK_LOCK_VOLUME     = "storage_engine_pool_backup_rollback_lock_volume"
+	CMD_STORAGE_ENGINE_POOL_IS_VOLUME_LOCKED                = "storage_engine_pool_is_volume_locked"
+	CMD_STORAGE_ENGINE_POOL_IS_VOLUME_USED                  = "storage_engine_pool_is_volume_used"
+	CMD_STORAGE_ENGINE_POOL_GET_IMAGE_METADATA              = "storage_engine_pool_get_image_metadata"
+	CMD_STORAGE_ENGINE_POOL_ROLLBACK_ALL_VOLUME             = "storage_engine_pool_rollback_all_volume"
+	CMD_STORAGE_ENGINE_POOL_LIST_LOCKED_VOLUMES             = "storage_engine_pool_list_locked_volumes"
+	CMD_STORAGE_ENGINE_LIST_ALL_LOCKED_VOLUMES              = "storage_engine_list_all_locked_volumes"
 
 	CMD_STORAGE_ENGINE_POOL_SUMMARY_VOLUME = "storage_engine_pool_summary_volume" //get a volume summary in the pool
 )
@@ -272,6 +285,7 @@ const (
 	STORAGE_PROTOCOL_PATH   StorageProtocol = "path"
 
 	LOCAL_STORAGE_NAME_INSIDE = "localstorage" //本地存储的adapter的名字，目录名和协议名
+
 )
 
 type JobStep = string

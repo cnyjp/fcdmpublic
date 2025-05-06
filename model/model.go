@@ -126,6 +126,8 @@ type Volume struct {
 
 	StageSize int64 `json:"stageSize,omitempty"` //The stageSize provider want for the volume.
 
+	CopyVersion int `json:"copyVersion,omitempty"` //same as image
+
 	ImageId             string `json:"imageId,omitempty"`             //image id for volume
 	StoragePoolId       string `json:"storagePoolId,omitempty"`       //pool id for volume
 	StoragePoolEngineId string `json:"storagePoolEngineId,omitempty"` //engine if for pool
@@ -371,9 +373,12 @@ type StorageSpace struct {
 	IsMounted bool              `json:"-"`                 //if the space is mounted to another pool.
 }
 
+// VolumeStorageSummary
 // the summary for a volume on storage
 type VolumeStorageSummary struct {
 	Status int    `json:"status"`
+	Size   int    `json:"size"` //the volume size defined, maybe there is no size defined on the volume.
+	Used   int    `json:"used"` //the volume used space -- real used size on the storage device.
 	Data   string `json:"data,omitempty"`
 	Detail string `json:"detail,omitempty"`
 }
