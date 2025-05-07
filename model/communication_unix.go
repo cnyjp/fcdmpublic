@@ -4,6 +4,8 @@
 package model
 
 import (
+	"errors"
+	"net"
 	"os"
 	"strconv"
 )
@@ -52,4 +54,9 @@ func (lss *LocalSocketServer) platformListen() error {
 	}
 	lss.listener = listener
 	return nil
+}
+
+func (lsc *LocalSocketClient) platformDail() (net.Conn, error) {
+	conn, err := net.DialTimeout("unix", lsc.name, 10)
+	return conn, err
 }
