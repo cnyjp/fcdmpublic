@@ -348,6 +348,17 @@ type StoragePool struct {
 	Name     string            `json:"name,omitempty"`
 	EngineId string            `json:"engineId,omitempty"`
 	Options  map[string]string `json:"options,omitempty"`
+
+	Size         int64          `json:"size"`
+	Used         int64          `json:"used"`
+	Free         int64          `json:"free"`
+	UsedSpaces   []StorageSpace `json:"usedSpaces,omitempty"`   //the space pool using
+	AddSpaces    []StorageSpace `json:"addSpaces,omitempty"`    //the space will add to pool, used on create or modify
+	RemoveSpaces []StorageSpace `json:"removeSpaces,omitempty"` //the space need remove from used space, used on modify
+	CacheSpaces  []StorageSpace `json:"cacheSpaces,omitempty"`  //the space use for cache, when the pool support cache
+	LogSpaces    []StorageSpace `json:"logSpaces,omitempty"`    //the log space, when the pool support log
+
+	ValidSpaces []StorageSpace `json:"validSpaces"` //the spaces can add to the pool
 }
 
 type StorageEngineStatus struct {
