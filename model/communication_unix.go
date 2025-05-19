@@ -4,10 +4,12 @@
 package model
 
 import (
+	"context"
 	"errors"
 	"net"
 	"os"
 	"strconv"
+	"time"
 )
 
 // generate local socket name
@@ -19,7 +21,7 @@ func genLocalSocketNameByPid(pid int) string {
 	return genLocalSocketNameByName(strconv.Itoa(pid))
 }
 func genLocalSocketNameByName(name string) string {
-	return `\\.\pipe\fcdm_plugin_pipe_` + name
+	return `/tmp/fcdm_plugin_pipe_` + name
 }
 
 func (lss *LocalSocketServer) platformListen() error {
@@ -56,7 +58,28 @@ func (lss *LocalSocketServer) platformListen() error {
 	return nil
 }
 
-func (lsc *LocalSocketClient) platformDail() (net.Conn, error) {
-	conn, err := net.DialTimeout("unix", lsc.name, 10)
-	return conn, err
+func (lsc *LocalSocketClient) platformDail(ctx context.Context, timeout time.Duration) (conn net.Conn, err error) {
+	errchan := make(chan error)
+	var ctx1 context.Context
+	if nil == ctx {
+		ctx1 = context.Background()
+	} else {
+		ctx1 = context.WithValue(ctx, "dail", "dail")
+	}
+	go func() {
+		defer close(errchan)
+		conn, err = net.DialTimeout("unix", lsc.name, timeout)
+		errchan <- err
+	}()
+	select {
+	case err = <-errchan:
+		{
+			return conn, err
+		}
+	case <-ctx1.Done():
+		{
+			err = ctx1.Err()
+			return conn, err
+		}
+	}
 }

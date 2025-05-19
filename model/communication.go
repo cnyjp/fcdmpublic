@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net"
@@ -131,12 +132,13 @@ type SocketCommandFunc func(request LocalSocketRequest) (response LocalSocketRes
 
 type LocalSocketServer struct {
 	name     string
-	listener net.Listener //server listenrer
+	listener net.Listener //server listener
 	quitchan chan int
 }
 
 type LocalSocketClient struct {
-	name string
+	name           string
+	defaultTimeout int //
 }
 
 func CreateLocalSocketClient() *LocalSocketClient {
@@ -151,15 +153,14 @@ func CreateLocalSocketClientByPid(pid int) *LocalSocketClient {
 	}
 }
 
-func CreateLocalSocketClientNamed(name string) *LocalSocketClient {
+func CreateLocalSocketClientByName(name string) *LocalSocketClient {
 	return &LocalSocketClient{
 		name: genLocalSocketNameByName(name),
 	}
 }
 
-func (lsc *LocalSocketClient) SendRequest(request LocalSocketRequest) LocalSocketResponse {
-	conn, err := lsc.platformDail()
-
+func (lsc *LocalSocketClient) SendRequest(ctx context.Context, request LocalSocketRequest, timeout time.Duration) LocalSocketResponse {
+	conn, err := lsc.platformDail(ctx, timeout)
 	if err != nil {
 		return request.GenErrorResponse("", err.Error(), "")
 	}
@@ -167,29 +168,60 @@ func (lsc *LocalSocketClient) SendRequest(request LocalSocketRequest) LocalSocke
 		conn.Close()
 	}()
 
-	conn.SetReadDeadline(time.Now().Add(time.Second * 20))
-
-	rba, err := json.Marshal(request)
-
-	_, err = conn.Write(rba)
-
-	if nil != err {
-		return request.GenErrorResponse("", err.Error(), "")
+	if timeout > 0 {
+		conn.SetDeadline(time.Now().Add(timeout))
+	} else {
+		conn.SetDeadline(time.Now().Add(time.Second * 30)) //default use 30 second for timeout
 	}
 
-	rsab, err := io.ReadAll(conn)
+	var response LocalSocketResponse
+	errchan := make(chan error)
+	go func() {
 
-	if nil != err {
-		//read error, but the content maybe right, so try to unmarshal read content.
+		rba, _ := json.Marshal(request)
+
+		_, err = conn.Write(rba)
+
+		if nil != err {
+			response = request.GenErrorResponse("", err.Error(), "")
+			errchan <- err
+			return
+		}
+
+		rsab, readError := io.ReadAll(conn)
+
+		if nil != err {
+			//read error, but the content maybe right, so try to unmarshal read content.
+		}
+
+		err = json.Unmarshal(rsab, &response)
+
+		if err != nil {
+			if nil != readError {
+				response = request.GenErrorResponse("", readError.Error(), "")
+				errchan <- readError
+			} else {
+				response = request.GenErrorResponse("", err.Error(), "")
+				errchan <- err
+			}
+			return
+		}
+		errchan <- nil
+	}()
+	var ctx1 context.Context
+	if nil == ctx {
+		ctx1 = context.Background()
+	} else {
+		ctx1 = context.WithValue(ctx, "request", "request")
 	}
-
-	response := LocalSocketResponse{}
-
-	err = json.Unmarshal(rsab, &response)
-
-	if err != nil {
-		return request.GenErrorResponse("", err.Error(), "")
+	select {
+	case err = <-errchan:
+		{
+			return response
+		}
+	case <-ctx1.Done():
+		{
+			return request.GenErrorResponse("", ctx1.Err().Error(), "")
+		}
 	}
-
-	return response
 }

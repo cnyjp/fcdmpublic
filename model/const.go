@@ -384,3 +384,7 @@ const (
 	COPY_ACTOR_SOURCE CopyActor = "source"
 	COPY_ACTOR_TARGET CopyActor = "target"
 )
+
+const (
+	COMM_CMD_CANCEL = "comm_cmd_cancel" //echo to plugin to cancel current task
+)
