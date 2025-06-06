@@ -379,7 +379,7 @@ type VolumeStorageSummary struct {
 	Status int    `json:"status"`
 	Size   int64  `json:"size"` //the volume size defined, maybe there is no size defined on the volume.
 	Used   int64  `json:"used"` //the volume used space -- real used size on the storage device.
-	Data   string `json:"data,omitempty"`
+	Data   string `json:"data"`
 	Detail string `json:"detail,omitempty"`
 }
 
@@ -409,6 +409,8 @@ type VolumeMetadata struct {
 	StoragePoolId string `json:"storagePoolId"`      //卷所在的存储池的id
 	StageSize     int64  `json:"stageSize"`          //为卷的接收准备的空间大小，由存储引擎进行实际的大小计算
 	BlockSize     int    `json:"blockSize"`          //BlockSize与StageSize为BlockDevice模式的卷需要的参数，在BlockDevice与filesystem转换的复制过程中，如何保证两者的信息不丢失？
+
+	Guid string `json:"Guid,omitempty"` //storage guid for volume, used for storageEngine to identity the volume.
 
 	StoragePoolOptions map[string]string `json:"storagePoolOptions,omitempty"` //the pool config options
 

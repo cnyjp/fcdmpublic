@@ -22,7 +22,8 @@ const (
 	//FCDM_EV_STAGE_PROTOCOL        = "FCDM_EV_STAGE_PROTOCOL"
 	//FCDM_EV_STAGE_PROTOCOL_TARGET = "FCDM_EV_STAGE_PROTOCOL_TARGET"
 
-	FCDM_EV_APPGROUP_ID = "FCDM_EV_APPGROUP_ID" //for provider, to distinguish if the run job is a group job.
+	FCDM_EV_APPGROUP_ID   = "FCDM_EV_APPGROUP_ID"   //for provider, to distinguish if the run job is a group job.
+	FCDM_EV_APPGROUP_APPS = "FCDM_EV_APPGROUP_APPS" //for provider, to distinguish if the run job is a group job.
 
 	//The application name used in provider run command.
 	FCDM_EV_APPNAME = "FCDM_EV_APPNAME"
